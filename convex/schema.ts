@@ -15,18 +15,18 @@ const appRoleValidator = v.union(v.literal("platform_admin"), v.literal("custome
 
 export default defineSchema({
 	customerMemberships: defineTable({
-		clerkOrganizationId: v.optional(v.string()),
-		clerkUserId: v.string(),
+		authUserId: v.string(),
 		customerId: v.id("customers"),
 		role: appRoleValidator,
+		userEmail: v.string(),
+		userName: v.optional(v.string()),
 	})
-		.index("by_clerk_user_id", ["clerkUserId"])
+		.index("by_auth_user_id", ["authUserId"])
 		.index("by_customer_id", ["customerId"])
-		.index("by_user_and_customer", ["clerkUserId", "customerId"]),
+		.index("by_user_and_customer", ["authUserId", "customerId"]),
 
 	customers: defineTable({
 		activeChannels: v.array(channelValidator),
-		clerkOrganizationId: v.string(),
 		createdAt: v.number(),
 		createdBy: v.string(),
 		currencyCode: v.string(),
@@ -36,6 +36,5 @@ export default defineSchema({
 		updatedAt: v.number(),
 		updatedBy: v.string(),
 	})
-		.index("by_clerk_organization_id", ["clerkOrganizationId"])
 		.index("by_slug", ["slug"]),
 });

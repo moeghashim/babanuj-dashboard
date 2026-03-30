@@ -15,7 +15,7 @@ export default async function CustomerPage() {
 						</Chip>
 						<h2>Customer-only visibility</h2>
 						<p>
-							This route requires an active Clerk organization and is reserved for customer viewers and platform
+							This route requires an active customer workspace and is reserved for customer viewers plus platform
 							admins inspecting the customer-facing experience.
 						</p>
 					</CardContent>
@@ -37,10 +37,10 @@ export default async function CustomerPage() {
 				<Card className="shell-panel">
 					<CardContent>
 						<Chip color="success" variant="soft">
-							Clerk org
+							Selected customer
 						</Chip>
-						<h2>Active organization</h2>
-						<p>{session.orgId ?? "No organization selected"}</p>
+						<h2>Active workspace</h2>
+						<p>{session.activeCustomerId ?? "No customer selected"}</p>
 					</CardContent>
 				</Card>
 			</section>

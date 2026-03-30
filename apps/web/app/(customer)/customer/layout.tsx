@@ -8,14 +8,14 @@ export default async function CustomerLayout({ children }: Readonly<{ children: 
 
 	return (
 		<DashboardShell
-			description="Customer users can review only their own organization's performance and finance summary. Admins can use this view to inspect the customer experience."
+			description="Customer users can review only their own workspace performance and finance summary. Admins can use this view to inspect the customer experience."
 			eyebrow="Customer workspace"
 			links={[
 				{ href: "/customer", label: "Overview" },
-				{ href: "/select-org", label: "Switch org" },
+				{ href: "/select-org", label: "Switch customer" },
 				{ href: "/admin", label: "Admin area" },
 			]}
-			showOrganizationSwitcher
+			showCustomerSwitcher
 			title="Customer Dashboard"
 		>
 			{children}

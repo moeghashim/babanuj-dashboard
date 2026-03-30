@@ -1,4 +1,4 @@
-import { SignUp } from "@clerk/nextjs";
+import { SignUpForm } from "../../../components/sign-up-form";
 
 export default function SignUpPage() {
 	return (
@@ -7,7 +7,7 @@ export default function SignUpPage() {
 				<p className="eyebrow">Authentication</p>
 				<h1>Create your Babanuj access.</h1>
 				<div className="hero-actions">
-					<SignUp signInUrl="/sign-in" />
+					<SignUpForm />
 				</div>
 			</section>
 		</main>

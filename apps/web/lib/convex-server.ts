@@ -1,9 +1,23 @@
-import { auth } from "@clerk/nextjs/server";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { makeFunctionReference } from "convex/server";
+import { headers } from "next/headers";
 
+import { auth } from "./auth-config";
 import type { CustomerMembershipRecord, CustomerRecord } from "./customers";
 
+type ViewerContextRecord = {
+	accessibleCustomerIds: string[];
+	customerMemberships: CustomerMembershipRecord[];
+	email: string | null;
+	isBootstrap: boolean;
+	isPlatformAdmin: boolean;
+	name: string | null;
+	userId: string;
+};
+
+const viewerContextRef = makeFunctionReference<"query", Record<string, never>, ViewerContextRecord>(
+	"customers:viewerContext",
+);
 const listAccessibleCustomersRef = makeFunctionReference<"query", Record<string, never>, CustomerRecord[]>(
 	"customers:listAccessibleCustomers",
 );
@@ -19,7 +33,6 @@ const createCustomerRef = makeFunctionReference<
 	"mutation",
 	{
 		activeChannels: CustomerRecord["activeChannels"];
-		clerkOrganizationId: string;
 		currencyCode: string;
 		name: string;
 		slug: string;
@@ -30,7 +43,6 @@ const updateCustomerRef = makeFunctionReference<
 	"mutation",
 	{
 		activeChannels: CustomerRecord["activeChannels"];
-		clerkOrganizationId: string;
 		currencyCode: string;
 		customerId: string;
 		name: string;
@@ -42,22 +54,35 @@ const updateCustomerRef = makeFunctionReference<
 const upsertMembershipRef = makeFunctionReference<
 	"mutation",
 	{
-		clerkOrganizationId?: string;
-		clerkUserId: string;
+		authUserId: string;
 		customerId: string;
 		role: CustomerMembershipRecord["role"];
+		userEmail: string;
+		userName?: string;
 	},
 	string
 >("memberships:upsertMembership");
 
 export async function getConvexToken() {
-	const authState = await auth();
+	try {
+		const tokenResponse = await auth.api.getToken({
+			headers: await headers(),
+		});
 
-	if (!authState.userId) {
+		return tokenResponse.token;
+	} catch {
+		return null;
+	}
+}
+
+export async function getViewerContext() {
+	const token = await getConvexToken();
+
+	if (!token) {
 		return null;
 	}
 
-	return authState.getToken({ template: "convex" });
+	return fetchQuery(viewerContextRef, {}, { token });
 }
 
 export async function listAccessibleCustomers() {
@@ -92,14 +117,13 @@ export async function listMembershipsForCustomer(customerId: string) {
 
 export async function createCustomer(payload: {
 	activeChannels: CustomerRecord["activeChannels"];
-	clerkOrganizationId: string;
 	currencyCode: string;
 	name: string;
 	slug: string;
 }) {
 	const token = await getConvexToken();
 	if (!token) {
-		throw new Error('Missing Clerk "convex" JWT token. Configure Clerk JWT template and sign in again.');
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the customer update.");
 	}
 
 	return fetchMutation(createCustomerRef, payload, { token });
@@ -107,7 +131,6 @@ export async function createCustomer(payload: {
 
 export async function updateCustomer(payload: {
 	activeChannels: CustomerRecord["activeChannels"];
-	clerkOrganizationId: string;
 	currencyCode: string;
 	customerId: string;
 	name: string;
@@ -116,21 +139,22 @@ export async function updateCustomer(payload: {
 }) {
 	const token = await getConvexToken();
 	if (!token) {
-		throw new Error('Missing Clerk "convex" JWT token. Configure Clerk JWT template and sign in again.');
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the customer update.");
 	}
 
 	return fetchMutation(updateCustomerRef, payload, { token });
 }
 
 export async function upsertMembership(payload: {
-	clerkOrganizationId?: string;
-	clerkUserId: string;
+	authUserId: string;
 	customerId: string;
 	role: CustomerMembershipRecord["role"];
+	userEmail: string;
+	userName?: string;
 }) {
 	const token = await getConvexToken();
 	if (!token) {
-		throw new Error('Missing Clerk "convex" JWT token. Configure Clerk JWT template and sign in again.');
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the membership update.");
 	}
 
 	return fetchMutation(upsertMembershipRef, payload, { token });

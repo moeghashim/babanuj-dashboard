@@ -25,26 +25,28 @@ export const listMembershipsForCustomer = queryGeneric({
 
 export const upsertMembership = mutationGeneric({
 	args: {
-		clerkOrganizationId: v.optional(v.string()),
-		clerkUserId: v.string(),
+		authUserId: v.string(),
 		customerId: v.id("customers"),
 		role: v.union(v.literal("platform_admin"), v.literal("customer_viewer")),
+		userEmail: v.string(),
+		userName: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
 		const identity = await requireIdentity(ctx);
 		await requirePlatformAdminMembership(ctx, identity.subject);
 
-		const existing = await ctx.db
-			.query("customerMemberships")
-			.withIndex("by_user_and_customer", (query) =>
-				query.eq("clerkUserId", args.clerkUserId).eq("customerId", args.customerId),
-			)
-			.first();
+		const existing = (
+			await ctx.db
+				.query("customerMemberships")
+				.withIndex("by_auth_user_id", (query) => query.eq("authUserId", args.authUserId))
+				.collect()
+		).find((membership) => membership.customerId === args.customerId);
 
 		if (existing) {
 			await ctx.db.patch(existing._id, {
-				clerkOrganizationId: args.clerkOrganizationId,
 				role: args.role,
+				userEmail: args.userEmail,
+				userName: args.userName,
 			});
 			return existing._id;
 		}

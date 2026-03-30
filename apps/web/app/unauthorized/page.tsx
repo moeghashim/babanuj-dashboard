@@ -8,8 +8,8 @@ export default function UnauthorizedPage() {
 				<p className="eyebrow">Unauthorized</p>
 				<h1>You do not have access to this area.</h1>
 				<p className="hero-copy">
-					Babanuj admins require `publicMetadata.appRole = "platform_admin"`. Customer users need a valid active
-					organization and customer-viewer access.
+					Babanuj admins require a `platform_admin` membership. Customer users need an active customer workspace
+					and `customer_viewer` access.
 				</p>
 				<div className="hero-actions">
 					<Link href="/">Return home</Link>
@@ -20,8 +20,8 @@ export default function UnauthorizedPage() {
 				<CardContent>
 					<h2>Access model</h2>
 					<p>
-						Foundation access checks run in middleware and again inside server layouts so route protection does
-						not depend only on client navigation.
+						Access checks run inside server layouts and Convex functions so route protection does not depend only
+						on client navigation.
 					</p>
 				</CardContent>
 			</Card>

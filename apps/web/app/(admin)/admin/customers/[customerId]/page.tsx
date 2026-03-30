@@ -31,10 +31,7 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 							Customer details
 						</Chip>
 						<h2>Maintain the customer record</h2>
-						<p>
-							Update metadata, organization mapping, active channels, and status without affecting historical
-							records.
-						</p>
+						<p>Update metadata, active channels, and status without affecting historical records.</p>
 						<CustomerForm action={updateCustomerAction} customer={customer} submitLabel="Save customer" />
 					</CardContent>
 				</Card>
@@ -46,18 +43,17 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 						</Chip>
 						<h2>Map customer access</h2>
 						<p>
-							Add Clerk user IDs to the customer and assign either `customer_viewer` or `platform_admin`. This
-							maps runtime access once org auth is live.
+							Map Better Auth users to this customer by email and assign either `customer_viewer` or
+							`platform_admin`. Users must sign up first so their account exists in the auth database.
 						</p>
 
 						<form action={upsertMembershipAction} className="shell-form">
 							<input name="customerId" type="hidden" value={customer._id} />
-							<input name="clerkOrganizationId" type="hidden" value={customer.clerkOrganizationId} />
 
 							<div className="form-grid">
 								<label className="field">
-									<span className="field-label">Clerk user ID</span>
-									<input className="shell-input" name="clerkUserId" required type="text" />
+									<span className="field-label">User email</span>
+									<input className="shell-input" name="memberEmail" required type="email" />
 								</label>
 
 								<label className="field">
@@ -81,10 +77,13 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 								{memberships.map((membership) => (
 									<li className="record-row" key={membership._id}>
 										<div>
-											<strong>{membership.clerkUserId}</strong>
-											<p>{membership.role}</p>
+											<strong>{membership.userEmail}</strong>
+											<p>
+												{membership.role}
+												{membership.userName ? ` · ${membership.userName}` : ""}
+											</p>
 										</div>
-										<span className="inline-note">{membership.clerkOrganizationId ?? "No org mapping"}</span>
+										<span className="inline-note">{membership.authUserId}</span>
 									</li>
 								))}
 							</ul>

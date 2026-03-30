@@ -13,7 +13,7 @@ Current repo focus:
 ## Product Direction
 
 - Babanuj admins manage all customers from one workspace.
-- Customer users are view-only and can access only their own organization.
+- Customer users are view-only and can access only their own customer workspace.
 - V1 reporting is monthly by channel.
 - V1 finance supports invoices, payments, and computed balances in a single currency.
 - Data entry is manual first, with future API ingestion planned.

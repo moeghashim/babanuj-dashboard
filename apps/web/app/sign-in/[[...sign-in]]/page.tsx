@@ -1,4 +1,4 @@
-import { SignIn } from "@clerk/nextjs";
+import { SignInForm } from "../../../components/sign-in-form";
 
 export default function SignInPage() {
 	return (
@@ -7,7 +7,7 @@ export default function SignInPage() {
 				<p className="eyebrow">Authentication</p>
 				<h1>Sign in to Babanuj.</h1>
 				<div className="hero-actions">
-					<SignIn signUpUrl="/sign-up" />
+					<SignInForm />
 				</div>
 			</section>
 		</main>

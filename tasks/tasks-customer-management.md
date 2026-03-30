@@ -8,7 +8,7 @@
 - `apps/web/components/customers/customer-form.tsx` - Reusable server form for customer create and edit workflows.
 - `apps/web/components/customers/channel-assignment.tsx` - Shared channel checkbox grid for customer assignment.
 - `apps/web/lib/customers.ts` - Customer types, channel constants, slug generation, and form parsing helpers.
-- `apps/web/lib/convex-server.ts` - Server-side Convex query/mutation wrappers using Clerk-authenticated tokens.
+- `apps/web/lib/convex-server.ts` - Server-side Convex query/mutation wrappers using Better Auth-issued tokens.
 - `apps/web/app/(admin)/admin/layout.tsx` - Admin navigation shell updated with customer-management entrypoints.
 - `apps/web/app/globals.css` - Shared form, list, and customer-management layout styles.
 - `convex/customers.ts` - Convex queries and mutations for customer CRUD and access control.
@@ -20,7 +20,7 @@
 ### Notes
 
 - Customer creation now bootstraps the creating admin as a `platform_admin` membership for that customer so the first customer can be created successfully.
-- Live Clerk invitation submission is still not implemented because the repo is not fully connected to a finalized Clerk org configuration and JWT template setup.
+- Membership mapping now uses Better Auth user email lookup. Invite/email-delivery workflow is still a future slice.
 - The admin pages use server-rendered Convex calls, so they compile and fit the current architecture without waiting for client-side Convex hooks.
 
 ## Instructions for Completing Tasks
@@ -39,15 +39,15 @@ Update the file after completing each sub-task, not just after completing an ent
 - [x] 1.0 Build the admin workflow for creating and maintaining customer records
   - [x] 1.1 Add an admin customers index page with customer creation and existing-customer listing.
   - [x] 1.2 Add server actions to create customers and revalidate the admin routes after writes.
-  - [x] 1.3 Add shared customer form helpers for name, slug, org mapping, currency, and status fields.
+  - [x] 1.3 Add shared customer form helpers for name, slug, currency, and status fields.
 - [x] 2.0 Implement channel assignment for each customer using the fixed v1 channel list
   - [x] 2.1 Add a shared channel assignment component using the agreed Babanuj channel contract.
   - [x] 2.2 Persist selected channels in customer create and update mutations.
   - [x] 2.3 Surface assigned channels through the customer-management pages and Convex customer records.
-- [ ] 3.0 Connect customer records to organization membership and customer-user invitation flows
-  - [x] 3.1 Add membership upsert support so admins can map Clerk users to customers with `customer_viewer` or `platform_admin`.
+- [ ] 3.0 Connect customer records to customer membership and customer-user access flows
+  - [x] 3.1 Add membership upsert support so admins can map Better Auth users to customers with `customer_viewer` or `platform_admin`.
   - [x] 3.2 Add customer-detail visibility for existing memberships on a customer.
-  - [ ] 3.3 Add live Clerk invitation submission once the Clerk org environment and JWT template configuration are finalized.
+  - [ ] 3.3 Add live invite or email-delivery flow once the preferred onboarding workflow is finalized.
 - [x] 4.0 Add admin-facing customer detail views for metadata updates and membership visibility
   - [x] 4.1 Add a customer detail route for editing metadata and active channels.
   - [x] 4.2 Add a membership management form on the customer detail route.
@@ -60,4 +60,4 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 6.1 Run `npm run build` after adding the customer pages and Convex server wrappers.
   - [x] 6.2 Run `npm run docs:list` to confirm documentation metadata remains valid.
   - [x] 6.3 Run `npm test` to confirm the existing workspace tests still pass.
-  - [x] 6.4 Record the remaining dependency on finalized Clerk invitation and JWT runtime configuration.
+  - [x] 6.4 Record the remaining dependency on finalized invite/email onboarding and production Better Auth runtime configuration.

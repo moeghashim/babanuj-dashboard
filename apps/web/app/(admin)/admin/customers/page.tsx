@@ -20,14 +20,13 @@ export default async function CustomersPage() {
 						</Chip>
 						<h2>Create a customer</h2>
 						<p>
-							Create the base customer record with an organization mapping, currency, and active channels. This
-							is the source record for future performance and finance data.
+							Create the base customer record with currency and active channels. This is the source record for
+							future performance and finance data.
 						</p>
 						<CustomerForm
 							action={createCustomerAction}
 							customer={{
 								activeChannels: [],
-								clerkOrganizationId: "",
 								currencyCode: "USD",
 								name: "",
 								slug: "",
@@ -73,10 +72,10 @@ export default async function CustomersPage() {
 						<Chip color="warning" variant="soft">
 							Runtime note
 						</Chip>
-						<h2>Invitation flow dependency</h2>
+						<h2>Access mapping dependency</h2>
 						<p>
-							Customer membership mapping is implemented below, but live Clerk invitations still depend on the
-							Clerk org setup and JWT configuration being finalized.
+							Customer membership mapping now uses Better Auth accounts. A user must create their Babanuj access
+							first, then an admin can map that email to a customer workspace.
 						</p>
 					</CardContent>
 				</Card>

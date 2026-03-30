@@ -5,7 +5,6 @@ type CustomerFormProps = {
 	customer?: {
 		_id?: string;
 		activeChannels: string[];
-		clerkOrganizationId: string;
 		currencyCode: string;
 		name: string;
 		slug: string;
@@ -28,17 +27,6 @@ export function CustomerForm({ action, customer, submitLabel }: CustomerFormProp
 				<label className="field">
 					<span className="field-label">Slug</span>
 					<input className="shell-input" defaultValue={customer?.slug ?? ""} name="slug" required type="text" />
-				</label>
-
-				<label className="field">
-					<span className="field-label">Clerk organization ID</span>
-					<input
-						className="shell-input"
-						defaultValue={customer?.clerkOrganizationId ?? ""}
-						name="clerkOrganizationId"
-						required
-						type="text"
-					/>
 				</label>
 
 				<label className="field">

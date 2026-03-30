@@ -4,7 +4,6 @@ export type CustomerChannel = (typeof CUSTOMER_CHANNELS)[number];
 export type CustomerRecord = {
 	_id: string;
 	activeChannels: CustomerChannel[];
-	clerkOrganizationId: string;
 	createdAt: number;
 	createdBy: string;
 	currencyCode: string;
@@ -17,10 +16,11 @@ export type CustomerRecord = {
 
 export type CustomerMembershipRecord = {
 	_id: string;
-	clerkOrganizationId?: string;
-	clerkUserId: string;
+	authUserId: string;
 	customerId: string;
 	role: "platform_admin" | "customer_viewer";
+	userEmail: string;
+	userName?: string | null;
 };
 
 export function parseChannelValues(formData: FormData, fieldName = "activeChannels") {

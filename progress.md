@@ -77,3 +77,18 @@ Append-only learning log for commits and deploys. Add new entries only at the en
   - scripts
   - .nvmrc
   - apps
+## 2026-03-30T23:46:08.471Z
+- Trigger: commit
+- Learning: Better Auth can replace Clerk cleanly here by moving tenant selection into app state, issuing JWTs for Convex via JWKS, and using a local libsql/Drizzle auth database for bootstrapable email-based membership mapping.
+- Context: feat(auth): replace clerk with better auth
+- Branch: codex/multi-tenant-foundation
+- Actor: Moe Ghashim <mohanadgh@gmail.com>
+- Changed Paths:
+  - .env.example
+  - .gitignore
+  - README.md
+  - apps/web
+  - convex
+  - docs
+  - tasks
+  - package-lock.json

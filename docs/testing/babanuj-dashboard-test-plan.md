@@ -13,7 +13,7 @@ This document defines the v1 test matrix for the Babanuj dashboard. It covers ha
 
 ## Test Strategy
 
-- Prefer server-side authorization tests for org isolation.
+- Prefer server-side authorization tests for customer isolation.
 - Cover Convex query and mutation behavior for finance and performance logic.
 - Cover UI role behavior for admin and customer users.
 - Verify calculations for balances, partial payments, and aggregate rollups.
@@ -48,7 +48,7 @@ Use repeatable seed scenarios with:
 
 #### Validation and Edge Cases
 
-- Missing org membership redirects or blocks access cleanly.
+- Missing customer membership or missing selected customer redirects or blocks access cleanly.
 - Suspended or removed membership loses access immediately.
 - Unknown route access resolves to safe unauthorized or not-found behavior.
 
@@ -63,8 +63,8 @@ Use repeatable seed scenarios with:
 
 - Admin creates a new customer successfully.
 - Admin assigns active channels to the customer.
-- Admin invites a customer viewer to the customer organization.
-- The invited user sees only the new customer workspace after first login.
+- Admin maps an existing Better Auth user to the customer by email.
+- The mapped user sees only the new customer workspace after login.
 
 #### Permissions
 
@@ -155,7 +155,7 @@ Use repeatable seed scenarios with:
 
 #### Regression Checks
 
-- Adding new metrics updates the customer dashboard without exposing cross-org data.
+- Adding new metrics updates the customer dashboard without exposing cross-customer data.
 
 ### 6. Finance Ledger
 
@@ -215,6 +215,6 @@ The v1 implementation is considered feature-complete only when:
 
 - Auth and data isolation work correctly.
 - Admin workflows for customer creation, metric entry, and finance entry work correctly.
-- Customer dashboards are read-only and org-scoped.
+- Customer dashboards are read-only and customer-scoped.
 - Balance and invoice calculations are correct.
 - Docs and parent-task files are complete and committed.

@@ -12,12 +12,12 @@ export async function requireIdentity(ctx: GenericQueryCtx<any>) {
 	return identity;
 }
 
-export async function getViewerMemberships(ctx: GenericQueryCtx<any>, clerkUserId: string) {
-	return ctx.db.query("customerMemberships").withIndex("by_clerk_user_id", (query) => query.eq("clerkUserId", clerkUserId)).collect();
+export async function getViewerMemberships(ctx: GenericQueryCtx<any>, authUserId: string) {
+	return ctx.db.query("customerMemberships").withIndex("by_auth_user_id", (query) => query.eq("authUserId", authUserId)).collect();
 }
 
-export async function requirePlatformAdminMembership(ctx: GenericQueryCtx<any>, clerkUserId: string) {
-	const memberships = await getViewerMemberships(ctx, clerkUserId);
+export async function requirePlatformAdminMembership(ctx: GenericQueryCtx<any>, authUserId: string) {
+	const memberships = await getViewerMemberships(ctx, authUserId);
 	const adminMembership = memberships.find((membership) => membership.role === "platform_admin");
 
 	if (adminMembership) {

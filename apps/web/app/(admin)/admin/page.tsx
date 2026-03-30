@@ -15,8 +15,8 @@ export default async function AdminPage() {
 						</Chip>
 						<h2>Role-aware access</h2>
 						<p>
-							Admin routes are protected by Clerk middleware and server-side role checks. Platform admins are
-							resolved from Clerk `publicMetadata.appRole`.
+							Admin routes are protected by Better Auth sessions plus Convex role checks. Platform admins are
+							resolved from the customer membership model instead of auth-provider metadata.
 						</p>
 					</CardContent>
 				</Card>
@@ -41,8 +41,8 @@ export default async function AdminPage() {
 						</Chip>
 						<h2>Configure environment keys</h2>
 						<p>
-							Add Clerk and Convex variables from `.env.example`, then set Babanuj admin users with
-							`publicMetadata.appRole = "platform_admin"`.
+							Add Better Auth and Convex variables from `.env.example`, then create the first customer to seed
+							the bootstrap admin membership.
 						</p>
 					</CardContent>
 				</Card>
@@ -54,8 +54,8 @@ export default async function AdminPage() {
 						<h3>Current session</h3>
 						<ul>
 							<li>User ID: {session.userId ?? "Not signed in"}</li>
-							<li>App role: {session.appRole ?? "Missing appRole metadata"}</li>
-							<li>Active org: {session.orgId ?? "No active organization"}</li>
+							<li>App role: {session.appRole ?? "No mapped role yet"}</li>
+							<li>Active customer: {session.activeCustomerId ?? "No customer selected"}</li>
 						</ul>
 					</CardContent>
 				</Card>

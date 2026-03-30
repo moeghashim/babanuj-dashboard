@@ -11,7 +11,7 @@ read_when:
 
 Babanuj needs a multi-tenant dashboard product that supports multiple customer workspaces plus a Babanuj admin workspace with visibility across all customers. The first release is manual-entry first, with clean preparation for future API-based ingestion by channel.
 
-The product will run on `Next.js + Vercel + Convex + Clerk + HeroUI` and use a single currency in v1. Customers are view-only in v1. Babanuj admins manage customer setup, performance data entry, invoice creation, and payment tracking.
+The product will run on `Next.js + Vercel + Convex + Better Auth + HeroUI` and use a single currency in v1. Customers are view-only in v1. Babanuj admins manage customer setup, performance data entry, invoice creation, and payment tracking.
 
 ## Goals
 
@@ -50,20 +50,19 @@ The product will run on `Next.js + Vercel + Convex + Clerk + HeroUI` and use a s
 
 ### 1. Multi-Tenant Access and Roles
 
-The product uses organization-aware access controls:
+The product uses app-owned customer access controls:
 
 - `platform_admin`: Babanuj staff with access to all customer data and all admin features.
-- `customer_viewer`: Customer user with read-only access to one organization.
+- `customer_viewer`: Customer user with read-only access to one customer workspace.
 
-Clerk organizations manage membership and route protection. Convex enforces org-scoped data access on the server side.
+Better Auth manages sign-in, sessions, and JWT issuance. Convex enforces customer-scoped data access on the server side, and the app stores the active customer selection as an application concern instead of an auth-provider organization.
 
 ### 2. Customer Management
 
 Babanuj admins can:
 
 - Create a customer record.
-- Associate a Clerk organization with that customer.
-- Invite customer users.
+- Map signed-up Better Auth users to that customer by email.
 - Assign the active sales channels for that customer.
 - Maintain basic customer metadata for reporting and finance.
 
@@ -139,7 +138,7 @@ The finance section supports partial payments in v1. Customers can view the full
 - Frontend framework: `Next.js`
 - Hosting: `Vercel`
 - Data layer and server functions: `Convex`
-- Auth and organizations: `Clerk`
+- Auth: `Better Auth`
 - Component system: `HeroUI`
 - Theme: provided HeroUI token set with `Bricolage Grotesque`
 - Currency model: single base currency in v1
@@ -170,14 +169,14 @@ The finance section supports partial payments in v1. Customers can view the full
 ### Multi-Tenant Foundation
 
 - Admin users can access admin routes and customer routes as needed.
-- Customer users can access only their own organization’s routes.
-- Unauthorized cross-org data access is blocked in both UI and server functions.
+- Customer users can access only their own customer workspace routes.
+- Unauthorized cross-customer data access is blocked in both UI and server functions.
 
 ### Customer Management
 
-- Admin can create a customer and associate it with an organization.
+- Admin can create a customer and manage it without any external auth-organization mapping.
 - Admin can assign supported channels to a customer.
-- Admin can invite customer users to the correct organization.
+- Admin can map signed-up Better Auth users to the correct customer by email.
 - Customer records can be updated without breaking historical metrics or finance records.
 
 ### Performance Data Entry

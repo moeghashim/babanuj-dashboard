@@ -14,7 +14,7 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
 				{ href: "/admin", label: "Overview" },
 				{ href: "/admin/customers", label: "Customers" },
 				{ href: "/customer", label: "Customer preview" },
-				{ href: "/select-org", label: "Org switcher" },
+				{ href: "/select-org", label: "Customer selector" },
 			]}
 			title="Babanuj Admin"
 		>

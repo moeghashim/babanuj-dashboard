@@ -20,10 +20,20 @@ export const viewerContext = queryGeneric({
 	handler: async (ctx) => {
 		const identity = await requireIdentity(ctx);
 		const memberships = await getViewerMemberships(ctx, identity.subject);
+		const isPlatformAdmin = memberships.some((membership) => membership.role === "platform_admin");
+		const accessibleCustomers = isPlatformAdmin
+			? await ctx.db.query("customers").collect()
+			: (await Promise.all(memberships.map((membership) => ctx.db.get(membership.customerId)))).filter(
+					(customer) => customer !== null,
+				);
+		const membershipCount = (await ctx.db.query("customerMemberships").collect()).length;
 
 		return {
+			accessibleCustomerIds: accessibleCustomers.map((customer) => customer._id),
 			customerMemberships: memberships,
 			email: identity.email ?? null,
+			isBootstrap: membershipCount === 0,
+			isPlatformAdmin,
 			name: identity.name ?? null,
 			userId: identity.subject,
 		};
@@ -49,7 +59,6 @@ export const listAccessibleCustomers = queryGeneric({
 export const createCustomer = mutationGeneric({
 	args: {
 		activeChannels: channelArrayValidator,
-		clerkOrganizationId: v.string(),
 		currencyCode: v.string(),
 		name: v.string(),
 		slug: v.string(),
@@ -60,7 +69,6 @@ export const createCustomer = mutationGeneric({
 		const now = Date.now();
 		const customerId = await ctx.db.insert("customers", {
 			activeChannels: args.activeChannels,
-			clerkOrganizationId: args.clerkOrganizationId,
 			createdAt: now,
 			createdBy: identity.subject,
 			currencyCode: args.currencyCode,
@@ -71,19 +79,17 @@ export const createCustomer = mutationGeneric({
 			updatedBy: identity.subject,
 		});
 
-		const existingMembership = await ctx.db
-			.query("customerMemberships")
-			.withIndex("by_user_and_customer", (query) =>
-				query.eq("clerkUserId", identity.subject).eq("customerId", customerId),
-			)
-			.first();
+		const existingMembership = (await getViewerMemberships(ctx, identity.subject)).find(
+			(membership) => membership.customerId === customerId,
+		);
 
 		if (!existingMembership) {
 			await ctx.db.insert("customerMemberships", {
-				clerkOrganizationId: args.clerkOrganizationId,
-				clerkUserId: identity.subject,
+				authUserId: identity.subject,
 				customerId,
 				role: "platform_admin",
+				userEmail: identity.email ?? "unknown@example.com",
+				userName: identity.name ?? undefined,
 			});
 		}
 
@@ -116,7 +122,6 @@ export const getCustomerById = queryGeneric({
 export const updateCustomer = mutationGeneric({
 	args: {
 		activeChannels: channelArrayValidator,
-		clerkOrganizationId: v.string(),
 		currencyCode: v.string(),
 		customerId: v.id("customers"),
 		name: v.string(),
@@ -129,7 +134,6 @@ export const updateCustomer = mutationGeneric({
 
 		await ctx.db.patch(args.customerId, {
 			activeChannels: args.activeChannels,
-			clerkOrganizationId: args.clerkOrganizationId,
 			currencyCode: args.currencyCode,
 			name: args.name,
 			slug: args.slug,

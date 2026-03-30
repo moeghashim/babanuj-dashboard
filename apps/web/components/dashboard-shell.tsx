@@ -8,7 +8,7 @@ type DashboardShellProps = {
 	description: string;
 	eyebrow: string;
 	links: Array<{ href: string; label: string }>;
-	showOrganizationSwitcher?: boolean;
+	showCustomerSwitcher?: boolean;
 	title: string;
 };
 
@@ -17,7 +17,7 @@ export function DashboardShell({
 	description,
 	eyebrow,
 	links,
-	showOrganizationSwitcher = false,
+	showCustomerSwitcher = false,
 	title,
 }: DashboardShellProps) {
 	return (
@@ -28,7 +28,7 @@ export function DashboardShell({
 					<h1 className="shell-title">{title}</h1>
 					<p className="shell-copy">{description}</p>
 				</div>
-				<SessionControls showOrganizationSwitcher={showOrganizationSwitcher} />
+				<SessionControls showCustomerSwitcher={showCustomerSwitcher} />
 			</header>
 
 			<nav aria-label={`${title} navigation`} className="shell-nav">
