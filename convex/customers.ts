@@ -58,8 +58,7 @@ export const createCustomer = mutationGeneric({
 		const identity = await requireIdentity(ctx);
 		await requirePlatformAdminMembership(ctx, identity.subject);
 		const now = Date.now();
-
-		return ctx.db.insert("customers", {
+		const customerId = await ctx.db.insert("customers", {
 			activeChannels: args.activeChannels,
 			clerkOrganizationId: args.clerkOrganizationId,
 			createdAt: now,
@@ -71,5 +70,74 @@ export const createCustomer = mutationGeneric({
 			updatedAt: now,
 			updatedBy: identity.subject,
 		});
+
+		const existingMembership = await ctx.db
+			.query("customerMemberships")
+			.withIndex("by_user_and_customer", (query) =>
+				query.eq("clerkUserId", identity.subject).eq("customerId", customerId),
+			)
+			.first();
+
+		if (!existingMembership) {
+			await ctx.db.insert("customerMemberships", {
+				clerkOrganizationId: args.clerkOrganizationId,
+				clerkUserId: identity.subject,
+				customerId,
+				role: "platform_admin",
+			});
+		}
+
+		return customerId;
+	},
+});
+
+export const getCustomerById = queryGeneric({
+	args: {
+		customerId: v.id("customers"),
+	},
+	handler: async (ctx, args) => {
+		const identity = await requireIdentity(ctx);
+		const memberships = await getViewerMemberships(ctx, identity.subject);
+		const isPlatformAdmin = memberships.some((membership) => membership.role === "platform_admin");
+
+		if (isPlatformAdmin) {
+			return ctx.db.get(args.customerId);
+		}
+
+		const hasAccess = memberships.some((membership) => membership.customerId === args.customerId);
+		if (!hasAccess) {
+			return null;
+		}
+
+		return ctx.db.get(args.customerId);
+	},
+});
+
+export const updateCustomer = mutationGeneric({
+	args: {
+		activeChannels: channelArrayValidator,
+		clerkOrganizationId: v.string(),
+		currencyCode: v.string(),
+		customerId: v.id("customers"),
+		name: v.string(),
+		slug: v.string(),
+		status: v.union(v.literal("active"), v.literal("inactive")),
+	},
+	handler: async (ctx, args) => {
+		const identity = await requireIdentity(ctx);
+		await requirePlatformAdminMembership(ctx, identity.subject);
+
+		await ctx.db.patch(args.customerId, {
+			activeChannels: args.activeChannels,
+			clerkOrganizationId: args.clerkOrganizationId,
+			currencyCode: args.currencyCode,
+			name: args.name,
+			slug: args.slug,
+			status: args.status,
+			updatedAt: Date.now(),
+			updatedBy: identity.subject,
+		});
+
+		return args.customerId;
 	},
 });

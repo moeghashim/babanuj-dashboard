@@ -1,7 +1,27 @@
-import { mutationGeneric } from "convex/server";
+import { mutationGeneric, queryGeneric } from "convex/server";
 import { v } from "convex/values";
 
-import { requireIdentity, requirePlatformAdminMembership } from "./auth";
+import { getViewerMemberships, requireIdentity, requirePlatformAdminMembership } from "./auth";
+
+export const listMembershipsForCustomer = queryGeneric({
+	args: {
+		customerId: v.id("customers"),
+	},
+	handler: async (ctx, args) => {
+		const identity = await requireIdentity(ctx);
+		const memberships = await getViewerMemberships(ctx, identity.subject);
+		const isPlatformAdmin = memberships.some((membership) => membership.role === "platform_admin");
+
+		if (!isPlatformAdmin) {
+			return [];
+		}
+
+		return ctx.db
+			.query("customerMemberships")
+			.withIndex("by_customer_id", (query) => query.eq("customerId", args.customerId))
+			.collect();
+	},
+});
 
 export const upsertMembership = mutationGeneric({
 	args: {

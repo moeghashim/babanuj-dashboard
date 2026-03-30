@@ -12,6 +12,7 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
 			eyebrow="Platform admin"
 			links={[
 				{ href: "/admin", label: "Overview" },
+				{ href: "/admin/customers", label: "Customers" },
 				{ href: "/customer", label: "Customer preview" },
 				{ href: "/select-org", label: "Org switcher" },
 			]}

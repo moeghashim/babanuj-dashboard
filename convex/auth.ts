@@ -20,9 +20,15 @@ export async function requirePlatformAdminMembership(ctx: GenericQueryCtx<any>, 
 	const memberships = await getViewerMemberships(ctx, clerkUserId);
 	const adminMembership = memberships.find((membership) => membership.role === "platform_admin");
 
-	if (!adminMembership) {
-		throw new ConvexError("Platform admin access required");
+	if (adminMembership) {
+		return adminMembership;
 	}
 
-	return adminMembership;
+	const existingMemberships = await ctx.db.query("customerMemberships").collect();
+
+	if (existingMemberships.length === 0) {
+		return null;
+	}
+
+	throw new ConvexError("Platform admin access required");
 }
