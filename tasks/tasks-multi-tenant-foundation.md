@@ -18,12 +18,13 @@
 - `apps/web/app/sign-up/[[...sign-up]]/page.tsx` - Better Auth sign-up entrypoint.
 - `apps/web/app/select-org/page.tsx` - Customer workspace selection page for customer viewers and admins.
 - `apps/web/app/unauthorized/page.tsx` - Unauthorized fallback page for failed role checks.
-- `apps/web/lib/auth-config.ts` - Better Auth configuration, JWT plugin, and email/password setup.
-- `apps/web/lib/auth-generated-schema.ts` - Generated Better Auth Drizzle schema contract.
-- `apps/web/drizzle.config.ts` - Drizzle push configuration for the local Better Auth database.
+- `apps/web/lib/auth-client.ts` - Better Auth browser client configured with the Convex plugin.
+- `apps/web/lib/auth-server.ts` - Auth-aware Next.js helpers that proxy Better Auth requests and Convex calls through the Convex component.
 - `convex/auth.config.ts` - Convex auth provider configuration for Better Auth JWT validation.
+- `convex/convex.config.ts` - Convex app registration for the Better Auth component.
+- `convex/http.ts` - Better Auth route registration on the Convex deployment.
 - `convex/schema.ts` - Convex schema for customers and customer memberships.
-- `convex/auth.ts` - Convex identity and membership guard helpers.
+- `convex/auth.ts` - Convex-backed Better Auth instance plus identity and membership guard helpers.
 - `convex/customers.ts` - Convex customer access queries and admin-only customer creation mutation.
 - `convex/memberships.ts` - Convex membership upsert mutation for tenant mapping.
 - `convex/tsconfig.json` - Convex TypeScript project config created during scaffold setup.
@@ -31,8 +32,8 @@
 ### Notes
 
 - HeroUI v3 in this repo uses the current `CardContent`, `Chip`, and `Button` prop surface, not the older `CardBody`, `flat`, or `as` patterns.
-- Better Auth schema generation now uses `npm run auth:generate -w apps/web`, and local schema application uses `npm run auth:push -w apps/web`.
-- Convex code generation depends on the bound deployment having `BETTER_AUTH_URL` configured so the custom JWT issuer can be validated.
+- Better Auth persistence now lives inside Convex, so local and production auth do not need the old sqlite/libsql setup.
+- Convex code generation depends on the bound deployment having `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` configured so the auth component can issue and validate session tokens.
 - Unit and integration tests for the web app are not configured yet, so validation in this slice is based on `npm run docs:list`, `npm run build`, and `npm test` for the existing package workspace.
 
 ## Instructions for Completing Tasks

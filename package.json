@@ -41,6 +41,7 @@
 		"node": "22.x"
 	},
 	"dependencies": {
+		"@convex-dev/better-auth": "^0.11.4",
 		"convex": "^1.34.1"
 	}
 }

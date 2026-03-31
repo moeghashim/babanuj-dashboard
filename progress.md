@@ -164,3 +164,17 @@ Append-only learning log for commits and deploys. Add new entries only at the en
   - apps/web/app/auth/complete/page.tsx
   - .env.example
   - docs/deploying-to-vercel.md
+## 2026-03-31T16:44:06.426Z
+- Trigger: commit
+- Learning: Better Auth can use Convex as both the auth store and JWT issuer here, which removes the unstable Vercel tmp database path and makes production bootstrap flows reliable once the Convex HTTP routes are deployed.
+- Context: feat(auth): migrate better auth persistence to convex
+- Branch: codex/finance-ledger
+- Actor: Moe Ghashim <mohanadgh@gmail.com>
+- Changed Paths:
+  - .env.example
+  - apps/web
+  - convex
+  - docs/deploying-to-vercel.md
+  - tasks/tasks-multi-tenant-foundation.md
+  - package.json
+  - package-lock.json

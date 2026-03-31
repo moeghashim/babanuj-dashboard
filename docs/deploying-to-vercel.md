@@ -20,14 +20,16 @@ Use Vercel Git integration as the default deployment path for this starter.
 
 Configure app-specific secrets in the Vercel project, scoped to `apps/web`.
 
-- `BETTER_AUTH_SECRET`
-- `BETTER_AUTH_URL`
 - `NEXT_PUBLIC_CONVEX_URL`
+- `CONVEX_SITE_URL`
 - `CONVEX_DEPLOYMENT`
-- `AUTH_DB_URL`
-- `AUTH_DB_AUTH_TOKEN` when `AUTH_DB_URL` points to a remote libsql/Turso database
 
-For production, `AUTH_DB_URL` must point to a persistent database. Do not use `file:/tmp/...` on Vercel, because Better Auth stores JWKS signing keys in the auth database and ephemeral storage will break JWT validation across instances.
+Better Auth persistence now lives in Convex through the `@convex-dev/better-auth` component, so the app no longer needs a separate production auth database on Vercel.
+
+Configure the matching auth settings on the Convex deployment as well:
+
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL=https://babanuj-dashboard.vercel.app`
 
 ## Solo Shipping Flow
 

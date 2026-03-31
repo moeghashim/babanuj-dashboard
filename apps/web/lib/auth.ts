@@ -4,7 +4,7 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
-import { auth } from "./auth-config";
+import { isAuthenticated } from "./auth-server";
 import { getViewerContext, listAccessibleCustomers } from "./convex-server";
 
 export const ACTIVE_CUSTOMER_COOKIE = "babanuj_active_customer";
@@ -14,7 +14,7 @@ export type AppRole = (typeof APP_ROLES)[number];
 export const CHANNELS = ["Website", "B2B", "Amazon", "TikTok", "Etsy", "Walmart", "Temu"] as const;
 export type Channel = (typeof CHANNELS)[number];
 
-function getAppRole(viewerContext: Awaited<ReturnType<typeof getViewerContext>>): AppRole | null {
+function getAppRole(viewerContext: Awaited<ReturnType<typeof getViewerContext>> | null): AppRole | null {
 	if (!viewerContext) {
 		return null;
 	}
@@ -43,16 +43,23 @@ function resolveActiveCustomerId(candidateId: string | null, accessibleCustomerI
 }
 
 export const getCurrentAppSession = cache(async () => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	});
-	const viewerContext = session ? await getViewerContext() : null;
-	const accessibleCustomers = session ? await listAccessibleCustomers() : [];
+	await headers();
+	const signedIn = await isAuthenticated();
+	const [viewerContext, accessibleCustomers] = signedIn
+		? await Promise.all([getViewerContext(), listAccessibleCustomers()])
+		: [null, []];
 	const cookieStore = await cookies();
 	const requestedCustomerId = cookieStore.get(ACTIVE_CUSTOMER_COOKIE)?.value ?? null;
 	const accessibleCustomerIds = accessibleCustomers.map((customer) => customer._id);
 	const activeCustomerId = resolveActiveCustomerId(requestedCustomerId, accessibleCustomerIds);
 	const appRole = getAppRole(viewerContext);
+	const user = viewerContext
+		? {
+				email: viewerContext.email,
+				id: viewerContext.userId,
+				name: viewerContext.name,
+			}
+		: null;
 
 	return {
 		activeCustomerId,
@@ -61,10 +68,10 @@ export const getCurrentAppSession = cache(async () => {
 		accessibleCustomers,
 		isBootstrap: viewerContext?.isBootstrap ?? false,
 		isPlatformAdmin: appRole === "platform_admin",
-		isSignedIn: Boolean(session?.user.id),
-		session: session?.session ?? null,
-		user: session?.user ?? null,
-		userId: session?.user.id ?? null,
+		isSignedIn: Boolean(user?.id),
+		session: null,
+		user,
+		userId: user?.id ?? null,
 		viewerContext,
 	};
 });

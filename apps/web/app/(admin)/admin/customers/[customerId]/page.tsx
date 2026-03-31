@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 
 import { CustomerForm } from "../../../../../components/customers/customer-form";
 import { requirePlatformAdmin } from "../../../../../lib/auth";
-import { betterAuthBaseUrl } from "../../../../../lib/auth-config";
 import { getCustomerById, listInvitesForCustomer, listMembershipsForCustomer } from "../../../../../lib/convex-server";
 import { formatDate } from "../../../../../lib/finance";
 import { createCustomerInviteAction, updateCustomerAction, upsertMembershipAction } from "../actions";
@@ -134,7 +133,7 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 					) : (
 						<ul className="record-list">
 							{invites.map((invite) => {
-								const inviteUrl = `${betterAuthBaseUrl}/invite/${invite.token}`;
+								const inviteUrl = `/invite/${invite.token}`;
 								return (
 									<li className="record-row" key={invite._id}>
 										<div>
