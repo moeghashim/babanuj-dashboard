@@ -63,6 +63,8 @@ Use repeatable seed scenarios with:
 
 - Admin creates a new customer successfully.
 - Admin assigns active channels to the customer.
+- Admin creates a customer invite for an email and role.
+- Invited user signs up or signs in with the invited email and receives the correct customer membership automatically.
 - Admin maps an existing Better Auth user to the customer by email.
 - The mapped user sees only the new customer workspace after login.
 
@@ -75,12 +77,15 @@ Use repeatable seed scenarios with:
 
 - Duplicate customer names are handled according to implementation rules.
 - Invalid or unsupported channel assignment is rejected.
+- Expired or already accepted invite links cannot be reused.
+- Invite acceptance fails cleanly when the signed-in email does not match the invited email.
 - Removing a channel does not corrupt existing historical performance data.
 
 #### Regression Checks
 
 - Updating customer metadata does not break reporting or finance joins.
 - Existing memberships remain valid after customer metadata edits.
+- Invite creation and acceptance do not remove existing memberships for other customers.
 
 ### 3. Monthly Performance Data Entry
 

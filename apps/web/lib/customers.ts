@@ -23,6 +23,28 @@ export type CustomerMembershipRecord = {
 	userName?: string | null;
 };
 
+export type CustomerInviteRecord = {
+	_id: string;
+	acceptedAt?: number;
+	acceptedBy?: string;
+	createdAt: number;
+	createdBy: string;
+	customerId: string;
+	email: string;
+	expiresAt: number;
+	role: "platform_admin" | "customer_viewer";
+	status: "pending" | "accepted" | "revoked";
+	token: string;
+	updatedAt: number;
+	updatedBy: string;
+};
+
+export type CustomerInviteDetailRecord = CustomerInviteRecord & {
+	customerName: string;
+	isExpired: boolean;
+	isValid: boolean;
+};
+
 export function parseChannelValues(formData: FormData, fieldName = "activeChannels") {
 	return CUSTOMER_CHANNELS.filter((channel) => formData.getAll(fieldName).includes(channel));
 }

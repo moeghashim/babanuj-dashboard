@@ -12,6 +12,7 @@ export default async function CustomerLayout({ children }: Readonly<{ children: 
 			eyebrow="Customer workspace"
 			links={[
 				{ href: "/customer", label: "Overview" },
+				{ href: "/customer/finance", label: "Finance" },
 				{ href: "/select-org", label: "Switch customer" },
 				{ href: "/admin", label: "Admin area" },
 			]}

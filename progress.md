@@ -113,3 +113,33 @@ Append-only learning log for commits and deploys. Add new entries only at the en
   - docs/deploying-to-vercel.md
   - tasks/tasks-performance-dashboards.md
   - package-lock.json
+## 2026-03-31T01:43:21.205Z
+- Trigger: commit
+- Learning: Finance and onboarding landed cleanly by keeping Convex as the system of record for invoices, payments, and invites, while Better Auth handled invite acceptance through auth-complete redirects instead of client-side effects.
+- Context: feat(dashboard): add finance ledger and invite workflows Repro-Prompt: Deploy the current Babanuj dashboard commit, add the finance ledger with admin and customer views, implement customer invite onboarding, and close the remaining documentation and QA tasks.
+- Branch: codex/finance-ledger
+- Actor: Moe Ghashim <mohanadgh@gmail.com>
+- Changed Paths:
+  - apps/web/app/(admin)/admin
+  - apps/web/app/(customer)/customer
+  - apps/web/app/auth/complete/page.tsx
+  - apps/web/app/sign-in
+  - apps/web/app/sign-up
+  - apps/web/app/invite
+  - apps/web/components/finance
+  - apps/web/components/sign-in-form.tsx
+  - apps/web/components/sign-up-form.tsx
+  - apps/web/lib/convex-server.ts
+  - apps/web/lib/customers.ts
+  - apps/web/lib/finance.ts
+  - convex/schema.ts
+  - convex/customerInvites.ts
+  - convex/financeShared.ts
+  - convex/invoices.ts
+  - convex/payments.ts
+  - convex/_generated/api.d.ts
+  - docs/prd/babanuj-dashboard.md
+  - docs/testing/babanuj-dashboard-test-plan.md
+  - tasks/tasks-customer-management.md
+  - tasks/tasks-documentation-and-qa.md
+  - tasks/tasks-finance-ledger.md

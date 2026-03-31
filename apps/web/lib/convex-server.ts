@@ -3,7 +3,13 @@ import { makeFunctionReference } from "convex/server";
 import { headers } from "next/headers";
 
 import { auth } from "./auth-config";
-import type { CustomerMembershipRecord, CustomerRecord } from "./customers";
+import type {
+	CustomerInviteDetailRecord,
+	CustomerInviteRecord,
+	CustomerMembershipRecord,
+	CustomerRecord,
+} from "./customers";
+import type { AdminFinanceOverview, CustomerFinanceOverview, InvoiceRecord } from "./finance";
 import type {
 	AdminMetricRecord,
 	AdminPerformanceOverview,
@@ -35,6 +41,12 @@ const listMembershipsForCustomerRef = makeFunctionReference<
 	{ customerId: string },
 	CustomerMembershipRecord[]
 >("memberships:listMembershipsForCustomer");
+const listInvitesForCustomerRef = makeFunctionReference<"query", { customerId: string }, CustomerInviteRecord[]>(
+	"customerInvites:listInvitesForCustomer",
+);
+const getInviteByTokenRef = makeFunctionReference<"query", { token: string }, CustomerInviteDetailRecord | null>(
+	"customerInvites:getInviteByToken",
+);
 const createCustomerRef = makeFunctionReference<
 	"mutation",
 	{
@@ -68,6 +80,19 @@ const upsertMembershipRef = makeFunctionReference<
 	},
 	string
 >("memberships:upsertMembership");
+const createCustomerInviteRef = makeFunctionReference<
+	"mutation",
+	{
+		customerId: string;
+		email: string;
+		expiresAt: number;
+		role: CustomerMembershipRecord["role"];
+	},
+	string
+>("customerInvites:createCustomerInvite");
+const acceptCustomerInviteRef = makeFunctionReference<"mutation", { token: string }, string>(
+	"customerInvites:acceptCustomerInvite",
+);
 const listReportingPeriodsRef = makeFunctionReference<"query", { customerId?: string }, ReportingPeriodRecord[]>(
 	"reportingPeriods:listReportingPeriods",
 );
@@ -101,6 +126,36 @@ const getCustomerPerformanceOverviewRef = makeFunctionReference<
 	{ customerId: string; periodKey?: string },
 	CustomerPerformanceOverview
 >("channelMetrics:getCustomerPerformanceOverview");
+const createInvoiceRef = makeFunctionReference<
+	"mutation",
+	{
+		amount: number;
+		customerId: string;
+		dueDate: number;
+		invoiceNumber: string;
+		issuedDate: number;
+		lifecycleStatus: InvoiceRecord["lifecycleStatus"];
+		note?: string;
+	},
+	string
+>("invoices:createInvoice");
+const getAdminFinanceOverviewRef = makeFunctionReference<"query", { customerId?: string }, AdminFinanceOverview>(
+	"invoices:getAdminFinanceOverview",
+);
+const getCustomerFinanceOverviewRef = makeFunctionReference<"query", { customerId: string }, CustomerFinanceOverview>(
+	"invoices:getCustomerFinanceOverview",
+);
+const createPaymentRef = makeFunctionReference<
+	"mutation",
+	{
+		amount: number;
+		invoiceId: string;
+		note?: string;
+		paymentDate: number;
+		reference?: string;
+	},
+	string
+>("payments:createPayment");
 
 export async function getConvexToken() {
 	try {
@@ -152,6 +207,20 @@ export async function listMembershipsForCustomer(customerId: string) {
 	}
 
 	return fetchQuery(listMembershipsForCustomerRef, { customerId }, { token });
+}
+
+export async function listInvitesForCustomer(customerId: string) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		return [];
+	}
+
+	return fetchQuery(listInvitesForCustomerRef, { customerId }, { token });
+}
+
+export async function getInviteByToken(token: string) {
+	return fetchQuery(getInviteByTokenRef, { token });
 }
 
 export async function createCustomer(payload: {
@@ -209,6 +278,31 @@ export async function upsertMembership(payload: {
 	return fetchMutation(upsertMembershipRef, payload, { token });
 }
 
+export async function createCustomerInvite(payload: {
+	customerId: string;
+	email: string;
+	expiresAt: number;
+	role: CustomerMembershipRecord["role"];
+}) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the invite update.");
+	}
+
+	return fetchMutation(createCustomerInviteRef, payload, { token });
+}
+
+export async function acceptCustomerInvite(tokenValue: string) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the invite acceptance.");
+	}
+
+	return fetchMutation(acceptCustomerInviteRef, { token: tokenValue }, { token });
+}
+
 export async function upsertChannelMetric(payload: {
 	channel: CustomerRecord["activeChannels"][number];
 	customerId: string;
@@ -257,4 +351,58 @@ export async function getCustomerPerformanceOverview(customerId: string, periodK
 	return fetchQuery(getCustomerPerformanceOverviewRef, periodKey ? { customerId, periodKey } : { customerId }, {
 		token,
 	});
+}
+
+export async function createInvoice(payload: {
+	amount: number;
+	customerId: string;
+	dueDate: number;
+	invoiceNumber: string;
+	issuedDate: number;
+	lifecycleStatus: InvoiceRecord["lifecycleStatus"];
+	note?: string;
+}) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the invoice update.");
+	}
+
+	return fetchMutation(createInvoiceRef, payload, { token });
+}
+
+export async function getAdminFinanceOverview(customerId?: string) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the finance request.");
+	}
+
+	return fetchQuery(getAdminFinanceOverviewRef, customerId ? { customerId } : {}, { token });
+}
+
+export async function getCustomerFinanceOverview(customerId: string) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the finance request.");
+	}
+
+	return fetchQuery(getCustomerFinanceOverviewRef, { customerId }, { token });
+}
+
+export async function createPayment(payload: {
+	amount: number;
+	invoiceId: string;
+	note?: string;
+	paymentDate: number;
+	reference?: string;
+}) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the payment update.");
+	}
+
+	return fetchMutation(createPaymentRef, payload, { token });
 }

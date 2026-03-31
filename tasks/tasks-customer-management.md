@@ -20,7 +20,7 @@
 ### Notes
 
 - Customer creation now bootstraps the creating admin as a `platform_admin` membership for that customer so the first customer can be created successfully.
-- Membership mapping now uses Better Auth user email lookup. Invite/email-delivery workflow is still a future slice.
+- Membership mapping now uses Better Auth user email lookup, and customer invites can bootstrap new users into the correct workspace without a mail provider dependency.
 - The admin pages use server-rendered Convex calls, so they compile and fit the current architecture without waiting for client-side Convex hooks.
 
 ## Instructions for Completing Tasks
@@ -35,7 +35,7 @@ Update the file after completing each sub-task, not just after completing an ent
 ## Tasks
 
 - [x] 0.0 Create feature branch
-  - [x] 0.1 Continue customer-management work on the active implementation branch (`codex/multi-tenant-foundation`)
+  - [x] 0.1 Continue customer-management work on the active implementation branch (`codex/finance-ledger`)
 - [x] 1.0 Build the admin workflow for creating and maintaining customer records
   - [x] 1.1 Add an admin customers index page with customer creation and existing-customer listing.
   - [x] 1.2 Add server actions to create customers and revalidate the admin routes after writes.
@@ -44,10 +44,10 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 2.1 Add a shared channel assignment component using the agreed Babanuj channel contract.
   - [x] 2.2 Persist selected channels in customer create and update mutations.
   - [x] 2.3 Surface assigned channels through the customer-management pages and Convex customer records.
-- [ ] 3.0 Connect customer records to customer membership and customer-user access flows
+- [x] 3.0 Connect customer records to customer membership and customer-user access flows
   - [x] 3.1 Add membership upsert support so admins can map Better Auth users to customers with `customer_viewer` or `platform_admin`.
   - [x] 3.2 Add customer-detail visibility for existing memberships on a customer.
-  - [ ] 3.3 Add live invite or email-delivery flow once the preferred onboarding workflow is finalized.
+  - [x] 3.3 Add live invite or email-delivery flow once the preferred onboarding workflow is finalized.
 - [x] 4.0 Add admin-facing customer detail views for metadata updates and membership visibility
   - [x] 4.1 Add a customer detail route for editing metadata and active channels.
   - [x] 4.2 Add a membership management form on the customer detail route.
@@ -60,4 +60,4 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 6.1 Run `npm run build` after adding the customer pages and Convex server wrappers.
   - [x] 6.2 Run `npm run docs:list` to confirm documentation metadata remains valid.
   - [x] 6.3 Run `npm test` to confirm the existing workspace tests still pass.
-  - [x] 6.4 Record the remaining dependency on finalized invite/email onboarding and production Better Auth runtime configuration.
+  - [x] 6.4 Record the remaining dependency on production Better Auth runtime configuration.

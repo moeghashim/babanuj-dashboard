@@ -62,9 +62,12 @@ Better Auth manages sign-in, sessions, and JWT issuance. Convex enforces custome
 Babanuj admins can:
 
 - Create a customer record.
+- Generate customer-scoped invite links for a specific email and role.
 - Map signed-up Better Auth users to that customer by email.
 - Assign the active sales channels for that customer.
 - Maintain basic customer metadata for reporting and finance.
+
+Invited users can sign up or sign in with the invited email, and the invite acceptance flow attaches the correct customer membership automatically.
 
 ### 3. Performance Reporting
 
@@ -151,6 +154,7 @@ The finance section supports partial payments in v1. Customers can view the full
 
 - `Customer`
 - `CustomerMembership`
+- `CustomerInvite`
 - `ReportingPeriod`
 - `ChannelMetric`
 - `Invoice`
@@ -175,6 +179,8 @@ The finance section supports partial payments in v1. Customers can view the full
 ### Customer Management
 
 - Admin can create a customer and manage it without any external auth-organization mapping.
+- Admin can create an invite link for a customer-specific email and role.
+- Invited users can complete sign-up or sign-in and have the correct membership attached automatically.
 - Admin can assign supported channels to a customer.
 - Admin can map signed-up Better Auth users to the correct customer by email.
 - Customer records can be updated without breaking historical metrics or finance records.
