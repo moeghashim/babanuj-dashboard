@@ -92,3 +92,12 @@ Append-only learning log for commits and deploys. Add new entries only at the en
   - docs
   - tasks
   - package-lock.json
+## 2026-03-31T00:16:38.465Z
+- Trigger: commit
+- Learning: Better Auth's Drizzle adapter in this repo needs the generated schema passed explicitly, and Vercel-linked local worktrees should ignore .vercel and env-local variants to avoid noisy auth-setup churn.
+- Context: fix(auth): stabilize better auth runtime setup
+- Branch: codex/multi-tenant-foundation
+- Actor: Moe Ghashim <mohanadgh@gmail.com>
+- Changed Paths:
+  - .gitignore
+  - apps/web/lib/auth-config.ts
