@@ -1,5 +1,3 @@
-import { Card, CardContent, Chip } from "@heroui/react";
-
 const appCards = [
 	{
 		title: "Model customer performance",
@@ -43,15 +41,11 @@ export default function HomePage() {
 
 			<section className="card-grid" aria-label="Starter capabilities" id="capabilities">
 				{appCards.map((card) => (
-					<Card className="feature-card" key={card.title}>
-						<CardContent>
-							<Chip className="card-accent" color="accent" variant="soft">
-								{card.accent}
-							</Chip>
-							<h2>{card.title}</h2>
-							<p>{card.description}</p>
-						</CardContent>
-					</Card>
+					<div className="feature-card" key={card.title}>
+						<span className="card-accent shell-chip shell-chip-accent">{card.accent}</span>
+						<h2>{card.title}</h2>
+						<p>{card.description}</p>
+					</div>
 				))}
 			</section>
 

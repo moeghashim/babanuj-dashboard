@@ -28,11 +28,11 @@ Update the file after completing each task, not just after completing an entire 
 
 ## Tasks
 
-- [ ] 0.0 Create feature branch
-  - [ ] 0.1 Create and checkout a new branch for this feature (e.g., `git checkout -b feature/performance-dashboards`)
-- [ ] 1.0 Implement the monthly performance data model and admin entry workflow for customer-channel metrics
-- [ ] 2.0 Build the Babanuj aggregate dashboard with cross-customer rollups by period and channel
-- [ ] 3.0 Build the customer dashboard with customer-scoped monthly performance views
-- [ ] 4.0 Add shared calculations and presentation logic for revenue, orders, AOV, and trends
-- [ ] 5.0 Preserve `manual` versus `integration` source metadata to keep the reporting model integration-ready
-- [ ] 6.0 Verify dashboard behavior against the PRD and test-plan requirements for scope, totals, and access control
+- [x] 0.0 Create feature branch
+  - [x] 0.1 Create and checkout a new branch for this feature (e.g., `git checkout -b feature/performance-dashboards`)
+- [x] 1.0 Implement the monthly performance data model and admin entry workflow for customer-channel metrics
+- [x] 2.0 Build the Babanuj aggregate dashboard with cross-customer rollups by period and channel
+- [x] 3.0 Build the customer dashboard with customer-scoped monthly performance views
+- [x] 4.0 Add shared calculations and presentation logic for revenue, orders, AOV, and trends
+- [x] 5.0 Preserve `manual` versus `integration` source metadata to keep the reporting model integration-ready
+- [x] 6.0 Verify dashboard behavior against the PRD and test-plan requirements for scope, totals, and access control

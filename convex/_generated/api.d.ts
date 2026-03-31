@@ -9,8 +9,10 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as channelMetrics from "../channelMetrics.js";
 import type * as customers from "../customers.js";
 import type * as memberships from "../memberships.js";
+import type * as reportingPeriods from "../reportingPeriods.js";
 
 import type {
   ApiFromModules,
@@ -20,8 +22,10 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  channelMetrics: typeof channelMetrics;
   customers: typeof customers;
   memberships: typeof memberships;
+  reportingPeriods: typeof reportingPeriods;
 }>;
 
 /**

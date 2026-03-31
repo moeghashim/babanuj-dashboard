@@ -1,4 +1,3 @@
-import { Button } from "@heroui/react";
 import Link from "next/link";
 
 import { setActiveCustomerAction } from "../app/select-org/actions";
@@ -32,9 +31,9 @@ export async function SessionControls({ showCustomerSwitcher = false }: SessionC
 									</option>
 								))}
 							</select>
-							<Button type="submit" variant="ghost">
+							<button className="shell-nav-link" type="submit">
 								Use workspace
-							</Button>
+							</button>
 						</form>
 					) : null}
 					<SignOutButton />

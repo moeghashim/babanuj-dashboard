@@ -101,3 +101,15 @@ Append-only learning log for commits and deploys. Add new entries only at the en
 - Changed Paths:
   - .gitignore
   - apps/web/lib/auth-config.ts
+## 2026-03-31T01:10:56.056Z
+- Trigger: commit
+- Learning: Vercel deployment for apps/web needed a pinned Next.js framework config, isolated workspace dependencies, and serialized Better Auth sqlite initialization before the admin and customer performance dashboards could ship cleanly.
+- Context: feat(performance): add monthly dashboard reporting
+- Branch: codex/multi-tenant-foundation
+- Actor: Moe Ghashim <mohanadgh@gmail.com>
+- Changed Paths:
+  - apps/web
+  - convex
+  - docs/deploying-to-vercel.md
+  - tasks/tasks-performance-dashboards.md
+  - package-lock.json

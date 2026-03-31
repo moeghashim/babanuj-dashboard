@@ -28,4 +28,4 @@ Start with no extra environment variables unless your app adds them. Configure a
 4. Push `main`
 5. Let Vercel build and deploy `apps/web`
 
-This starter does not require a custom `vercel.json`.
+This workspace includes `apps/web/vercel.json` so the `apps/web` project always deploys with the Next.js framework preset even if the Vercel project was initially created with generic build settings.

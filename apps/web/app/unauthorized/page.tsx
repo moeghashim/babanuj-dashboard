@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@heroui/react";
 import Link from "next/link";
 
 export default function UnauthorizedPage() {
@@ -16,15 +15,13 @@ export default function UnauthorizedPage() {
 				</div>
 			</section>
 
-			<Card className="shell-panel">
-				<CardContent>
-					<h2>Access model</h2>
-					<p>
-						Access checks run inside server layouts and Convex functions so route protection does not depend only
-						on client navigation.
-					</p>
-				</CardContent>
-			</Card>
+			<div className="shell-panel">
+				<h2>Access model</h2>
+				<p>
+					Access checks run inside server layouts and Convex functions so route protection does not depend only on
+					client navigation.
+				</p>
+			</div>
 		</main>
 	);
 }

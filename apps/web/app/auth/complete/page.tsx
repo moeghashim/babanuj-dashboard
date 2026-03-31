@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 
 import { getCurrentAppSession } from "../../../lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export default async function AuthCompletePage() {
 	const session = await getCurrentAppSession();
 

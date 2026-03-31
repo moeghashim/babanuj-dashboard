@@ -12,8 +12,28 @@ const channelValidator = v.union(
 );
 
 const appRoleValidator = v.union(v.literal("platform_admin"), v.literal("customer_viewer"));
+const recordSourceValidator = v.union(v.literal("manual"), v.literal("integration"));
 
 export default defineSchema({
+	channelMetrics: defineTable({
+		averageOrderValue: v.number(),
+		channel: channelValidator,
+		createdAt: v.number(),
+		createdBy: v.string(),
+		customerId: v.id("customers"),
+		grossRevenue: v.number(),
+		orderCount: v.number(),
+		periodId: v.id("reportingPeriods"),
+		periodKey: v.string(),
+		source: recordSourceValidator,
+		sourceReference: v.optional(v.string()),
+		updatedAt: v.number(),
+		updatedBy: v.string(),
+	})
+		.index("by_customer_period", ["customerId", "periodKey"])
+		.index("by_customer_period_channel", ["customerId", "periodKey", "channel"])
+		.index("by_period", ["periodKey"]),
+
 	customerMemberships: defineTable({
 		authUserId: v.string(),
 		customerId: v.id("customers"),
@@ -37,4 +57,13 @@ export default defineSchema({
 		updatedBy: v.string(),
 	})
 		.index("by_slug", ["slug"]),
+
+	reportingPeriods: defineTable({
+		createdAt: v.number(),
+		label: v.string(),
+		month: v.number(),
+		periodKey: v.string(),
+		year: v.number(),
+	})
+		.index("by_period_key", ["periodKey"]),
 });

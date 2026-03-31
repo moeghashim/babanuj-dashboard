@@ -1,5 +1,3 @@
-import { Card, CardContent } from "@heroui/react";
-
 import { getCurrentAppSession } from "../../lib/auth";
 import { setActiveCustomerAction } from "./actions";
 
@@ -39,15 +37,13 @@ export default async function SelectOrgPage() {
 				)}
 			</section>
 
-			<Card className="shell-panel">
-				<CardContent>
-					<h2>Admin note</h2>
-					<p>
-						Customer selection is now an app-owned tenant boundary. Convex still enforces customer-scoped data
-						access on the server side.
-					</p>
-				</CardContent>
-			</Card>
+			<div className="shell-panel">
+				<h2>Admin note</h2>
+				<p>
+					Customer selection is now an app-owned tenant boundary. Convex still enforces customer-scoped data access
+					on the server side.
+				</p>
+			</div>
 		</main>
 	);
 }

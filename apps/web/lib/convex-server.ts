@@ -4,6 +4,12 @@ import { headers } from "next/headers";
 
 import { auth } from "./auth-config";
 import type { CustomerMembershipRecord, CustomerRecord } from "./customers";
+import type {
+	AdminMetricRecord,
+	AdminPerformanceOverview,
+	CustomerPerformanceOverview,
+	ReportingPeriodRecord,
+} from "./performance";
 
 type ViewerContextRecord = {
 	accessibleCustomerIds: string[];
@@ -62,6 +68,39 @@ const upsertMembershipRef = makeFunctionReference<
 	},
 	string
 >("memberships:upsertMembership");
+const listReportingPeriodsRef = makeFunctionReference<"query", { customerId?: string }, ReportingPeriodRecord[]>(
+	"reportingPeriods:listReportingPeriods",
+);
+const upsertChannelMetricRef = makeFunctionReference<
+	"mutation",
+	{
+		channel: CustomerRecord["activeChannels"][number];
+		customerId: string;
+		grossRevenue: number;
+		orderCount: number;
+		periodKey: string;
+		source: "manual" | "integration";
+		sourceReference?: string;
+	},
+	string
+>("channelMetrics:upsertChannelMetric");
+const getAdminPerformanceOverviewRef = makeFunctionReference<"query", { periodKey?: string }, AdminPerformanceOverview>(
+	"channelMetrics:getAdminPerformanceOverview",
+);
+const listAdminMetricsForPeriodRef = makeFunctionReference<
+	"query",
+	{ periodKey?: string },
+	{
+		availablePeriods: ReportingPeriodRecord[];
+		metrics: AdminMetricRecord[];
+		selectedPeriod: ReportingPeriodRecord | null;
+	}
+>("channelMetrics:listAdminMetricsForPeriod");
+const getCustomerPerformanceOverviewRef = makeFunctionReference<
+	"query",
+	{ customerId: string; periodKey?: string },
+	CustomerPerformanceOverview
+>("channelMetrics:getCustomerPerformanceOverview");
 
 export async function getConvexToken() {
 	try {
@@ -129,6 +168,16 @@ export async function createCustomer(payload: {
 	return fetchMutation(createCustomerRef, payload, { token });
 }
 
+export async function listReportingPeriods(customerId?: string) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		return [];
+	}
+
+	return fetchQuery(listReportingPeriodsRef, customerId ? { customerId } : {}, { token });
+}
+
 export async function updateCustomer(payload: {
 	activeChannels: CustomerRecord["activeChannels"];
 	currencyCode: string;
@@ -158,4 +207,54 @@ export async function upsertMembership(payload: {
 	}
 
 	return fetchMutation(upsertMembershipRef, payload, { token });
+}
+
+export async function upsertChannelMetric(payload: {
+	channel: CustomerRecord["activeChannels"][number];
+	customerId: string;
+	grossRevenue: number;
+	orderCount: number;
+	periodKey: string;
+	source: "manual" | "integration";
+	sourceReference?: string;
+}) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the performance update.");
+	}
+
+	return fetchMutation(upsertChannelMetricRef, payload, { token });
+}
+
+export async function getAdminPerformanceOverview(periodKey?: string) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the dashboard request.");
+	}
+
+	return fetchQuery(getAdminPerformanceOverviewRef, periodKey ? { periodKey } : {}, { token });
+}
+
+export async function listAdminMetricsForPeriod(periodKey?: string) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the dashboard request.");
+	}
+
+	return fetchQuery(listAdminMetricsForPeriodRef, periodKey ? { periodKey } : {}, { token });
+}
+
+export async function getCustomerPerformanceOverview(customerId: string, periodKey?: string) {
+	const token = await getConvexToken();
+
+	if (!token) {
+		throw new Error("Missing Better Auth JWT token. Sign in again and retry the dashboard request.");
+	}
+
+	return fetchQuery(getCustomerPerformanceOverviewRef, periodKey ? { customerId, periodKey } : { customerId }, {
+		token,
+	});
 }
