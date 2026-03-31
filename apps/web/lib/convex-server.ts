@@ -169,6 +169,16 @@ export async function getConvexToken() {
 	}
 }
 
+function getConvexDeploymentUrl() {
+	const deploymentUrl = process.env.NEXT_PUBLIC_CONVEX_URL ?? process.env.CONVEX_URL;
+
+	if (!deploymentUrl) {
+		throw new Error("Convex deployment URL is not configured.");
+	}
+
+	return deploymentUrl;
+}
+
 export async function getViewerContext() {
 	const token = await getConvexToken();
 
@@ -176,7 +186,7 @@ export async function getViewerContext() {
 		return null;
 	}
 
-	return fetchQuery(viewerContextRef, {}, { token });
+	return fetchQuery(viewerContextRef, {}, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function listAccessibleCustomers() {
@@ -186,7 +196,7 @@ export async function listAccessibleCustomers() {
 		return [];
 	}
 
-	return fetchQuery(listAccessibleCustomersRef, {}, { token });
+	return fetchQuery(listAccessibleCustomersRef, {}, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function getCustomerById(customerId: string) {
@@ -196,7 +206,7 @@ export async function getCustomerById(customerId: string) {
 		return null;
 	}
 
-	return fetchQuery(getCustomerByIdRef, { customerId }, { token });
+	return fetchQuery(getCustomerByIdRef, { customerId }, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function listMembershipsForCustomer(customerId: string) {
@@ -206,7 +216,7 @@ export async function listMembershipsForCustomer(customerId: string) {
 		return [];
 	}
 
-	return fetchQuery(listMembershipsForCustomerRef, { customerId }, { token });
+	return fetchQuery(listMembershipsForCustomerRef, { customerId }, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function listInvitesForCustomer(customerId: string) {
@@ -216,11 +226,11 @@ export async function listInvitesForCustomer(customerId: string) {
 		return [];
 	}
 
-	return fetchQuery(listInvitesForCustomerRef, { customerId }, { token });
+	return fetchQuery(listInvitesForCustomerRef, { customerId }, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function getInviteByToken(token: string) {
-	return fetchQuery(getInviteByTokenRef, { token });
+	return fetchQuery(getInviteByTokenRef, { token }, { url: getConvexDeploymentUrl() });
 }
 
 export async function createCustomer(payload: {
@@ -234,7 +244,7 @@ export async function createCustomer(payload: {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the customer update.");
 	}
 
-	return fetchMutation(createCustomerRef, payload, { token });
+	return fetchMutation(createCustomerRef, payload, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function listReportingPeriods(customerId?: string) {
@@ -244,7 +254,10 @@ export async function listReportingPeriods(customerId?: string) {
 		return [];
 	}
 
-	return fetchQuery(listReportingPeriodsRef, customerId ? { customerId } : {}, { token });
+	return fetchQuery(listReportingPeriodsRef, customerId ? { customerId } : {}, {
+		token,
+		url: getConvexDeploymentUrl(),
+	});
 }
 
 export async function updateCustomer(payload: {
@@ -260,7 +273,7 @@ export async function updateCustomer(payload: {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the customer update.");
 	}
 
-	return fetchMutation(updateCustomerRef, payload, { token });
+	return fetchMutation(updateCustomerRef, payload, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function upsertMembership(payload: {
@@ -275,7 +288,7 @@ export async function upsertMembership(payload: {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the membership update.");
 	}
 
-	return fetchMutation(upsertMembershipRef, payload, { token });
+	return fetchMutation(upsertMembershipRef, payload, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function createCustomerInvite(payload: {
@@ -290,7 +303,7 @@ export async function createCustomerInvite(payload: {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the invite update.");
 	}
 
-	return fetchMutation(createCustomerInviteRef, payload, { token });
+	return fetchMutation(createCustomerInviteRef, payload, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function acceptCustomerInvite(tokenValue: string) {
@@ -300,7 +313,7 @@ export async function acceptCustomerInvite(tokenValue: string) {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the invite acceptance.");
 	}
 
-	return fetchMutation(acceptCustomerInviteRef, { token: tokenValue }, { token });
+	return fetchMutation(acceptCustomerInviteRef, { token: tokenValue }, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function upsertChannelMetric(payload: {
@@ -318,7 +331,7 @@ export async function upsertChannelMetric(payload: {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the performance update.");
 	}
 
-	return fetchMutation(upsertChannelMetricRef, payload, { token });
+	return fetchMutation(upsertChannelMetricRef, payload, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function getAdminPerformanceOverview(periodKey?: string) {
@@ -328,7 +341,10 @@ export async function getAdminPerformanceOverview(periodKey?: string) {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the dashboard request.");
 	}
 
-	return fetchQuery(getAdminPerformanceOverviewRef, periodKey ? { periodKey } : {}, { token });
+	return fetchQuery(getAdminPerformanceOverviewRef, periodKey ? { periodKey } : {}, {
+		token,
+		url: getConvexDeploymentUrl(),
+	});
 }
 
 export async function listAdminMetricsForPeriod(periodKey?: string) {
@@ -338,7 +354,10 @@ export async function listAdminMetricsForPeriod(periodKey?: string) {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the dashboard request.");
 	}
 
-	return fetchQuery(listAdminMetricsForPeriodRef, periodKey ? { periodKey } : {}, { token });
+	return fetchQuery(listAdminMetricsForPeriodRef, periodKey ? { periodKey } : {}, {
+		token,
+		url: getConvexDeploymentUrl(),
+	});
 }
 
 export async function getCustomerPerformanceOverview(customerId: string, periodKey?: string) {
@@ -350,6 +369,7 @@ export async function getCustomerPerformanceOverview(customerId: string, periodK
 
 	return fetchQuery(getCustomerPerformanceOverviewRef, periodKey ? { customerId, periodKey } : { customerId }, {
 		token,
+		url: getConvexDeploymentUrl(),
 	});
 }
 
@@ -368,7 +388,7 @@ export async function createInvoice(payload: {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the invoice update.");
 	}
 
-	return fetchMutation(createInvoiceRef, payload, { token });
+	return fetchMutation(createInvoiceRef, payload, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function getAdminFinanceOverview(customerId?: string) {
@@ -378,7 +398,10 @@ export async function getAdminFinanceOverview(customerId?: string) {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the finance request.");
 	}
 
-	return fetchQuery(getAdminFinanceOverviewRef, customerId ? { customerId } : {}, { token });
+	return fetchQuery(getAdminFinanceOverviewRef, customerId ? { customerId } : {}, {
+		token,
+		url: getConvexDeploymentUrl(),
+	});
 }
 
 export async function getCustomerFinanceOverview(customerId: string) {
@@ -388,7 +411,7 @@ export async function getCustomerFinanceOverview(customerId: string) {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the finance request.");
 	}
 
-	return fetchQuery(getCustomerFinanceOverviewRef, { customerId }, { token });
+	return fetchQuery(getCustomerFinanceOverviewRef, { customerId }, { token, url: getConvexDeploymentUrl() });
 }
 
 export async function createPayment(payload: {
@@ -404,5 +427,5 @@ export async function createPayment(payload: {
 		throw new Error("Missing Better Auth JWT token. Sign in again and retry the payment update.");
 	}
 
-	return fetchMutation(createPaymentRef, payload, { token });
+	return fetchMutation(createPaymentRef, payload, { token, url: getConvexDeploymentUrl() });
 }

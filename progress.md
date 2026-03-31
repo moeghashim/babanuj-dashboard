@@ -143,3 +143,11 @@ Append-only learning log for commits and deploys. Add new entries only at the en
   - tasks/tasks-customer-management.md
   - tasks/tasks-documentation-and-qa.md
   - tasks/tasks-finance-ledger.md
+## 2026-03-31T01:49:25.595Z
+- Trigger: commit
+- Learning: Explicitly passing the Convex deployment URL from server wrappers avoids monorepo workspace env resolution gaps and makes public server-side queries like invite lookup reliable in both local and Vercel runtimes.
+- Context: fix(convex): pass deployment url explicitly in server wrappers Repro-Prompt: Fix the public invite route by making all server-side Convex query and mutation calls pass the deployment URL explicitly instead of relying on implicit environment discovery.
+- Branch: codex/finance-ledger
+- Actor: Moe Ghashim <mohanadgh@gmail.com>
+- Changed Paths:
+  - apps/web/lib/convex-server.ts
