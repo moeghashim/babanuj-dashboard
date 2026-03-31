@@ -151,3 +151,16 @@ Append-only learning log for commits and deploys. Add new entries only at the en
 - Actor: Moe Ghashim <mohanadgh@gmail.com>
 - Changed Paths:
   - apps/web/lib/convex-server.ts
+## 2026-03-31T02:57:31.980Z
+- Trigger: commit
+- Learning: Better Auth on Vercel needs a persistent auth database for stable JWKS, and bootstrap users should be routed directly into the admin setup flow.
+- Context: fix(auth): harden production token bridge
+- Branch: codex/finance-ledger
+- Actor: Moe Ghashim <mohanadgh@gmail.com>
+- Changed Paths:
+  - apps/web/lib/convex-server.ts
+  - apps/web/lib/auth-db.ts
+  - apps/web/drizzle.config.ts
+  - apps/web/app/auth/complete/page.tsx
+  - .env.example
+  - docs/deploying-to-vercel.md

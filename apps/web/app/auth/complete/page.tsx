@@ -27,6 +27,10 @@ export default async function AuthCompletePage({ searchParams }: AuthCompletePag
 		}
 	}
 
+	if (session.isBootstrap) {
+		redirect("/admin/customers");
+	}
+
 	if (session.isPlatformAdmin) {
 		redirect("/admin");
 	}

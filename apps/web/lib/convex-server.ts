@@ -158,9 +158,32 @@ const createPaymentRef = makeFunctionReference<
 >("payments:createPayment");
 
 export async function getConvexToken() {
+	const requestHeaders = await headers();
+	const cookieHeader = requestHeaders.get("cookie");
+
+	if (cookieHeader) {
+		try {
+			const tokenResponse = await fetch(`${process.env.BETTER_AUTH_URL ?? "http://localhost:3000"}/api/auth/token`, {
+				cache: "no-store",
+				headers: {
+					cookie: cookieHeader,
+				},
+			});
+
+			if (tokenResponse.ok) {
+				const payload = (await tokenResponse.json()) as { token?: string };
+				if (typeof payload.token === "string") {
+					return payload.token;
+				}
+			}
+		} catch {
+			// Fall through to the in-process Better Auth helper.
+		}
+	}
+
 	try {
 		const tokenResponse = await auth.api.getToken({
-			headers: await headers(),
+			headers: requestHeaders,
 		});
 
 		return tokenResponse.token;

@@ -18,7 +18,16 @@ Use Vercel Git integration as the default deployment path for this starter.
 
 ## Environment Variables
 
-Start with no extra environment variables unless your app adds them. Configure app-specific secrets in the Vercel project, scoped to `apps/web`.
+Configure app-specific secrets in the Vercel project, scoped to `apps/web`.
+
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL`
+- `NEXT_PUBLIC_CONVEX_URL`
+- `CONVEX_DEPLOYMENT`
+- `AUTH_DB_URL`
+- `AUTH_DB_AUTH_TOKEN` when `AUTH_DB_URL` points to a remote libsql/Turso database
+
+For production, `AUTH_DB_URL` must point to a persistent database. Do not use `file:/tmp/...` on Vercel, because Better Auth stores JWKS signing keys in the auth database and ephemeral storage will break JWT validation across instances.
 
 ## Solo Shipping Flow
 

@@ -13,8 +13,16 @@ const defaultDatabasePath = process.env.VERCEL ? "/tmp/better-auth.db" : join(au
 mkdirSync(dirname(defaultDatabasePath), { recursive: true });
 
 export const authDatabaseUrl = process.env.AUTH_DB_URL ?? `file:${defaultDatabasePath}`;
+const authDatabaseAuthToken = process.env.AUTH_DB_AUTH_TOKEN;
+
+if (process.env.VERCEL && authDatabaseUrl.startsWith("file:")) {
+	console.warn(
+		"AUTH_DB_URL is using a local file path on Vercel. Configure a persistent remote libsql database for Better Auth in production.",
+	);
+}
 
 const authClient = createClient({
+	authToken: authDatabaseAuthToken,
 	url: authDatabaseUrl,
 });
 
