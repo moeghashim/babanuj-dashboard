@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Babanuj Ops Dashboard</title>
+<style>
+  @font-face{font-family:"Bricolage Grotesque";font-weight:600 800;font-display:swap;src:url("/fonts/marketplace/bricolage-grotesque-latin.woff2") format("woff2");}
+  @font-face{font-family:"DM Sans";font-weight:400 800;font-display:swap;src:url("/fonts/marketplace/dm-sans-latin.woff2") format("woff2");}
+  @font-face{font-family:"DM Serif Display";font-style:italic;font-weight:400;font-display:swap;src:url("/fonts/marketplace/dm-serif-display-latin-italic.woff2") format("woff2");}
+
+  :root{
+    --bg:#f1ead9; --paper:#f6f1e7; --card:#fffdf8; --ink:#1f2a1c; --ink-2:#4a5240;
+    --rule:rgba(31,42,28,.12); --rule-2:rgba(31,42,28,.07);
+    --accent:#1a1410; --soft:#efece4; --warn:#b04d1a; --good:#3f6b3a; --blue:#315d81;
+    --cream:#f9f3e6; --tan:#e8d7b8; --olive:#6b7257;
+    --bric:"Bricolage Grotesque"; --sans:"DM Sans"; --serif:"DM Serif Display";
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:var(--sans),system-ui,sans-serif; color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 12% -10%, #fbf7ee 0%, rgba(251,247,238,0) 60%),
+      radial-gradient(900px 500px at 100% 0%, #f3ecda 0%, rgba(243,236,218,0) 55%),
+      var(--bg);
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  .wrap{max-width:1240px;margin:0 auto;padding:22px 26px 56px}
+  .top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--rule)}
+  .brand{display:flex;flex-direction:column;gap:2px}
+  .eyebrow{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--olive)}
+  .word{font-family:var(--bric);font-weight:800;font-size:30px;line-height:1}
+  .word small{font-weight:700;font-size:30px;color:var(--ink-2)}
+  .controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+  .seg,.tabs{display:inline-flex;border:1px solid var(--rule);border-radius:999px;background:var(--card);overflow:hidden}
+  .seg button,.tabs button{font-family:var(--sans);font-weight:700;font-size:12.5px;color:var(--ink-2);border:0;border-left:1px solid var(--rule-2);background:transparent;padding:7px 14px;cursor:pointer;white-space:nowrap}
+  .seg button:first-child,.tabs button:first-child{border-left:0}
+  .seg button.on,.tabs button.on{background:var(--ink);color:#f6f1e7}
+  .tabs{margin:18px 0 2px;border-radius:10px;flex-wrap:wrap}
+  .tabs button{border-radius:0}
+  .sync{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 0 3px rgba(176,77,26,.16)}
+  .dot.live{background:var(--good);box-shadow:0 0 0 3px rgba(63,107,58,.16)}
+  .dot.error{background:var(--warn);box-shadow:0 0 0 3px rgba(176,77,26,.16)}
+  .refresh{font-family:var(--sans);font-weight:700;font-size:12.5px;border:1px solid var(--rule);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 13px;cursor:pointer}
+  .refresh:hover{background:var(--ink);color:var(--paper)}
+  .pipe{margin-top:9px;font-size:11.5px;color:var(--olive);letter-spacing:.1px;text-align:right}
+  .pipe code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:var(--soft);padding:1px 6px;border-radius:5px;color:var(--ink-2)}
+  .sec{display:flex;align-items:baseline;gap:10px;margin:26px 2px 12px}
+  .sec h2{font-family:var(--bric);font-weight:800;font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin:0;color:var(--ink-2)}
+  .sec span{font-family:var(--serif);font-style:italic;color:var(--olive);font-size:14px}
+  .sec .line{flex:1;height:1px;background:var(--rule-2)}
+
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  .kpi{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:15px 16px 12px;min-height:128px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 0 rgba(31,42,28,.03),0 10px 26px -22px rgba(31,42,28,.5)}
+  .lab{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--olive)}
+  .num{font-family:var(--bric);font-weight:800;font-size:27px;margin:7px 0 4px;line-height:1.04;overflow-wrap:anywhere}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .delta{font-size:12px;font-weight:800;display:inline-flex;align-items:center;gap:3px;color:var(--olive)}
+  .delta.live{color:var(--good)} .delta.partial{color:var(--blue)} .delta.error{color:var(--warn)} .delta.needs_config{color:#9a6b19}
+  .spark{display:block;flex:none;opacity:.95}
+
+  .chs{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  .ch{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:15px 16px 13px;display:flex;flex-direction:column;min-height:226px;box-shadow:0 10px 26px -24px rgba(31,42,28,.55)}
+  .ch.hidden{display:none}
+  .ch .h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .name{font-family:var(--bric);font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px}
+  .pill{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:999px;letter-spacing:.03em;white-space:nowrap}
+  .pill.live{background:rgba(63,107,58,.12);color:var(--good)}
+  .pill.partial{background:rgba(49,93,129,.12);color:var(--blue)}
+  .pill.needs_config{background:rgba(154,107,25,.13);color:#9a6b19}
+  .pill.error{background:rgba(176,77,26,.13);color:var(--warn)}
+  .src{font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--olive);margin-top:3px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:13px 0 4px}
+  .met .k{font-size:11px;color:var(--olive);font-weight:700}
+  .met .v{font-family:var(--bric);font-weight:800;font-size:18px;margin-top:1px;overflow-wrap:anywhere}
+  .message{font-size:11.5px;color:var(--olive);line-height:1.45;margin-top:auto;padding-top:12px;border-top:1px solid var(--rule-2)}
+
+  .split{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+  .panel{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:16px 18px;box-shadow:0 10px 26px -24px rgba(31,42,28,.55)}
+  .panel .ph{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+  .panel .ph h3{font-family:var(--bric);font-weight:800;font-size:15px;margin:0}
+  .panel .ph .meta{font-size:11.5px;color:var(--olive);text-align:right}
+  .legend{display:flex;gap:16px;margin:6px 0 2px;font-size:11.5px;color:var(--ink-2)}
+  .legend i{display:inline-block;width:18px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+  .empty-chart{height:220px;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;border:1px dashed var(--rule);border-radius:12px;background:linear-gradient(180deg,rgba(239,236,228,.55),rgba(255,253,248,.65));color:var(--olive);font-size:13px;line-height:1.45}
+  .note{font-size:11.5px;color:var(--olive);font-family:var(--serif);font-style:italic;margin:2px 0 10px}
+  .aq{display:flex;flex-direction:column;gap:0}
+  .item{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--rule-2)}
+  .item:first-child{border-top:0}
+  .tag{font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 7px;border-radius:6px;white-space:nowrap;margin-top:1px}
+  .t-shop{background:#e9efe1;color:#46612f}.t-amz{background:#fdeede;color:#8a4d12}.t-goo{background:#e6eef6;color:#2f5378}.t-meta{background:#efe7f3;color:#5e3f74}.t-db{background:#eee9df;color:#61543d}
+  .item .body{flex:1;min-width:0}
+  .item .ttl{font-size:13px;font-weight:700;line-height:1.3}
+  .item .sub{font-size:11.5px;color:var(--olive);margin-top:2px}
+  .go{font-family:var(--sans);font-weight:800;font-size:11px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:8px;padding:6px 11px;white-space:nowrap;margin-top:1px}
+  .actp{margin-top:0}
+  .arow{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-top:1px solid var(--rule-2)}
+  .arow:first-child{border-top:0}
+  .when{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--olive);width:78px;flex:none;margin-top:1px}
+  .arow .body{flex:1;min-width:0}
+  .arow .ttl{font-size:12.5px;font-weight:700}
+  .st{font-size:11px;font-weight:800;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;margin-top:1px}
+  .st-live{color:var(--good)} .st-sync{color:var(--olive)} .st-warn{color:var(--warn)}
+  .products-panel{display:none}
+  .products-panel.active{display:block}
+  .table-wrap{overflow:auto;border:1px solid var(--rule);border-radius:12px;background:var(--card)}
+  table{width:100%;border-collapse:collapse;min-width:880px}
+  th,td{font-size:12px;text-align:left;padding:11px 12px;border-bottom:1px solid var(--rule-2);vertical-align:top}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--olive);background:var(--paper)}
+  tr:last-child td{border-bottom:0}
+  .muted{color:var(--olive)}
+  .status-note{font-size:12px;color:var(--olive);line-height:1.45;margin:0 0 12px}
+  .foot{margin-top:22px;padding-top:14px;border-top:1px solid var(--rule);font-size:11.5px;color:var(--olive);line-height:1.6}
+  .foot code{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;background:var(--soft);padding:1px 5px;border-radius:5px}
+
+  @media(max-width:1180px){.kpis{grid-template-columns:repeat(2,1fr)}.chs{grid-template-columns:repeat(2,1fr)}.split{grid-template-columns:1fr}}
+  @media(max-width:620px){.wrap{padding:18px 14px 40px}.kpis,.chs{grid-template-columns:1fr}.controls{justify-content:flex-start}.pipe{text-align:left}.top{align-items:flex-start}.tabs{display:flex;border-radius:10px}.tabs button{flex:1 1 42%;border-top:1px solid var(--rule-2)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <div class="eyebrow">Command Center</div>
+      <div class="word">babanuj <small>ops</small></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0">
+      <div class="controls">
+        <div class="seg" role="group" aria-label="date range">
+          <button data-range="7d">7D</button>
+          <button class="on" data-range="30d">30D</button>
+          <button data-range="90d">90D</button>
+          <button data-range="ytd">YTD</button>
+        </div>
+        <div class="sync" role="status"><span class="dot" id="syncDot"></span><span id="syncText">Loading metrics</span></div>
+        <button class="refresh" id="refreshButton" type="button">Refresh</button>
+      </div>
+      <div class="pipe" id="sourcePipe">Reading latest cached snapshot</div>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="dashboard views">
+    <button class="on" data-view="overall" type="button">Overall</button>
+    <button data-view="shopify" type="button">Shopify</button>
+    <button data-view="amazon" type="button">Amazon</button>
+    <button data-view="google" type="button">Google</button>
+    <button data-view="meta" type="button">Meta</button>
+    <button data-view="products" type="button">Products & Prices</button>
+    <button data-view="audit" type="button">Ads Audit</button>
+  </div>
+
+  <section id="metricsView">
+    <div class="sec"><h2>Scorecard</h2><span id="rangeLabel">last 30 days</span><div class="line"></div></div>
+    <div class="kpis">
+      <div class="kpi">
+        <div><div class="lab">Live Products</div><div class="num" id="kpiProducts">Loading</div></div>
+        <div class="row"><span class="delta" id="kpiProductsStatus">Shopify Storefront</span><svg class="spark" width="78" height="26" viewBox="0 0 78 26"><polyline fill="none" stroke="#3f6b3a" stroke-width="2" points="0,21 11,19 22,16 33,17 44,12 55,10 66,8 78,3"/></svg></div>
+      </div>
+      <div class="kpi">
+        <div><div class="lab">Available</div><div class="num" id="kpiAvailable">Loading</div></div>
+        <div class="row"><span class="delta" id="kpiAvailableStatus">Shopify Storefront</span><svg class="spark" width="78" height="26" viewBox="0 0 78 26"><polyline fill="none" stroke="#3f6b3a" stroke-width="2" points="0,18 11,16 22,17 33,14 44,12 55,10 66,8 78,8"/></svg></div>
+      </div>
+      <div class="kpi">
+        <div><div class="lab">Avg Shopify Price</div><div class="num" id="kpiAvgPrice">Loading</div></div>
+        <div class="row"><span class="delta" id="kpiAvgPriceStatus">Storefront prices</span><svg class="spark" width="78" height="26" viewBox="0 0 78 26"><polyline fill="none" stroke="#315d81" stroke-width="2" points="0,14 11,12 22,13 33,11 44,11 55,9 66,8 78,7"/></svg></div>
+      </div>
+      <div class="kpi">
+        <div><div class="lab">Price Range</div><div class="num" id="kpiPriceRange">Loading</div></div>
+        <div class="row"><span class="delta" id="kpiPriceRangeStatus">Lowest - highest</span><svg class="spark" width="78" height="26" viewBox="0 0 78 26"><polyline fill="none" stroke="#315d81" stroke-width="2" points="0,20 11,16 22,18 33,12 44,15 55,9 66,7 78,5"/></svg></div>
+      </div>
+      <div class="kpi">
+        <div><div class="lab">Net Revenue</div><div class="num" id="kpiRevenue">Loading</div></div>
+        <div class="row"><span class="delta" id="kpiRevenueStatus">Shopify Admin</span><svg class="spark" width="78" height="26" viewBox="0 0 78 26"><polyline fill="none" stroke="#3f6b3a" stroke-width="2" points="0,20 11,18 22,19 33,13 44,14 55,8 66,9 78,4"/></svg></div>
+      </div>
+    </div>
+
+    <div class="sec"><h2>Channels</h2><span>platform views</span><div class="line"></div></div>
+    <div class="chs">
+      <div class="ch platform-card" data-platform="shopify">
+        <div><div class="h"><div class="name">Shopify Store</div><span class="pill needs_config" id="shopifyStatus">Loading</span></div><div class="src">shopify-storefront + shopify-admin</div></div>
+        <div class="grid2">
+          <div class="met"><div class="k">Products</div><div class="v" id="shopifyProducts">Loading</div></div>
+          <div class="met"><div class="k">Available</div><div class="v" id="shopifyAvailable">Loading</div></div>
+          <div class="met"><div class="k">Avg Price</div><div class="v" id="shopifyAvgPrice">Loading</div></div>
+          <div class="met"><div class="k">Range</div><div class="v" id="shopifyPriceRange">Loading</div></div>
+        </div>
+        <div class="message" id="shopifyMessage">Loading Shopify metrics.</div>
+      </div>
+      <div class="ch platform-card" data-platform="amazon">
+        <div><div class="h"><div class="name">Amazon</div><span class="pill needs_config" id="amazonStatus">Loading</span></div><div class="src">seller-api + fba-inventory</div></div>
+        <div class="grid2">
+          <div class="met"><div class="k">SKUs</div><div class="v" id="amazonSpend">Needs key</div></div>
+          <div class="met"><div class="k">In Stock</div><div class="v" id="amazonSales">Needs key</div></div>
+          <div class="met"><div class="k">Units</div><div class="v" id="amazonRoas">Needs key</div></div>
+          <div class="met"><div class="k">Marketplace</div><div class="v" id="amazonAcos">Needs key</div></div>
+        </div>
+        <div class="message" id="amazonMessage">Amazon connectors are ready for credentials.</div>
+      </div>
+      <div class="ch platform-card" data-platform="google">
+        <div><div class="h"><div class="name">Google Ads</div><span class="pill needs_config" id="googleStatus">Loading</span></div><div class="src">google-ads-api</div></div>
+        <div class="grid2">
+          <div class="met"><div class="k">Spend</div><div class="v" id="googleSpend">Loading</div></div>
+          <div class="met"><div class="k">Conversions</div><div class="v" id="googleConversions">Loading</div></div>
+          <div class="met"><div class="k">CPA</div><div class="v" id="googleCpa">Loading</div></div>
+          <div class="met"><div class="k">ROAS</div><div class="v" id="googleRoas">Loading</div></div>
+        </div>
+        <div class="message" id="googleMessage">Loading Google Ads metrics.</div>
+      </div>
+      <div class="ch platform-card" data-platform="search">
+        <div><div class="h"><div class="name">Search Console</div><span class="pill needs_config" id="searchStatus">Loading</span></div><div class="src">search-console-api</div></div>
+        <div class="grid2">
+          <div class="met"><div class="k">Clicks</div><div class="v" id="searchClicks">Needs key</div></div>
+          <div class="met"><div class="k">Impressions</div><div class="v" id="searchImpressions">Needs key</div></div>
+          <div class="met"><div class="k">CTR</div><div class="v" id="searchCtr">Needs key</div></div>
+          <div class="met"><div class="k">Avg Pos.</div><div class="v" id="searchPosition">Needs key</div></div>
+        </div>
+        <div class="message" id="searchMessage">Search Console connector is ready for credentials.</div>
+      </div>
+      <div class="ch platform-card" data-platform="meta">
+        <div><div class="h"><div class="name">Meta</div><span class="pill needs_config" id="metaStatus">Future</span></div><div class="src">meta-marketing-api</div></div>
+        <div class="grid2">
+          <div class="met"><div class="k">Spend</div><div class="v" id="metaSpend">Needs key</div></div>
+          <div class="met"><div class="k">Conversions</div><div class="v" id="metaConversions">Needs key</div></div>
+          <div class="met"><div class="k">CPA</div><div class="v" id="metaCpa">Needs key</div></div>
+          <div class="met"><div class="k">ROAS</div><div class="v" id="metaRoas">Needs key</div></div>
+        </div>
+        <div class="message" id="metaMessage">Meta is reserved for a future Marketing API connector.</div>
+      </div>
+    </div>
+
+    <div class="sec"><h2>Trend & Actions</h2><span>cached numbers, rule-based next steps</span><div class="line"></div></div>
+    <div class="split">
+      <div class="panel">
+        <div class="ph"><h3>Revenue vs Ad Spend</h3><div class="meta" id="chartMeta">Awaiting history</div></div>
+        <div class="legend"><span><i style="background:#3f6b3a"></i>Revenue</span><span><i style="background:#b04d1a"></i>Ad spend</span></div>
+        <div class="empty-chart" id="chartArea">Connect revenue and ad spend snapshots to render the trend. Cached history will appear here after scheduled syncs.</div>
+      </div>
+      <div class="panel">
+        <div class="ph"><h3>Action Queue</h3><div class="meta" id="actionMeta">Rule-based</div></div>
+        <div class="note">No LLM calls. Suggestions are deterministic rules only.</div>
+        <div class="aq" id="actionQueue"></div>
+      </div>
+    </div>
+
+    <div class="sec"><h2>Activity</h2><span>sync and source health</span><div class="line"></div></div>
+    <div class="panel actp" id="activityPanel"></div>
+  </section>
+
+  <section class="products-panel" id="productsPanel">
+    <div class="sec"><h2>Products & Prices</h2><span>Shopify vs Amazon listings</span><div class="line"></div></div>
+    <div class="panel">
+      <div class="ph"><h3>Product Comparison</h3><div class="meta" id="productsMeta">Not loaded</div></div>
+      <p class="status-note" id="productsStatus">Open this tab to load product snapshots.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Product</th><th>SKU</th><th>Shopify Price</th><th>Amazon Price</th><th>Price Delta</th><th>Shopify Sales</th><th>Amazon Units</th></tr></thead>
+          <tbody id="productsBody"><tr><td colspan="7" class="muted">No product snapshot loaded yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="products-panel" id="auditPanel">
+    <div class="sec"><h2>Amazon Ads Audit</h2><span id="auditScope">Sponsored Products · enabled · 1-1-5 doctrine</span><div class="line"></div></div>
+    <div class="panel">
+      <div class="ph"><h3>Structure health</h3><div class="meta" id="auditMeta">Not loaded</div></div>
+      <p class="status-note" id="auditStatus">Open this tab to load the latest audit snapshot.</p>
+      <div class="kpis" id="auditStats" style="margin-bottom:14px"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h3>Keyword cannibalization</h3><div class="meta" id="auditCannibMeta">same keyword + match across multiple enabled campaigns</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Keyword</th><th>Match</th><th>Campaigns competing</th></tr></thead>
+          <tbody id="auditCannibBody"><tr><td colspan="3" class="muted">No audit loaded yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h3>Per-ASIN coverage</h3><div class="meta" id="auditAsinMeta">campaigns per ASIN and gaps vs doctrine</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ASIN</th><th>Campaigns</th><th>Product ads</th><th>Structure</th><th>Missing</th></tr></thead>
+          <tbody id="auditAsinBody"><tr><td colspan="5" class="muted">No audit loaded yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    Values come from <code>/api/metrics</code> and <code>/api/products</code>. With a dashboard database URL configured, page reads use saved snapshots and <code>/api/cron/sync</code> refreshes them every four hours.
+  </div>
+</div>
+
+<script>
+  const state = { range: "30d", view: "overall" };
+  const rangeLabels = { "7d": "last 7 days", "30d": "last 30 days", "90d": "last 90 days", ytd: "year to date" };
+  let productsLoaded = false;
+  let auditLoaded = false;
+
+  function byId(id) { return document.getElementById(id); }
+  function text(id, value) { const node = byId(id); if (node) node.textContent = value || "Not connected"; }
+  function statusLabel(status) { if (status === "live") return "Live"; if (status === "partial") return "Catalog live"; if (status === "error") return "Error"; return "Needs key"; }
+  function setPill(id, status) { const node = byId(id); if (!node) return; node.className = `pill ${status || "needs_config"}`; node.textContent = statusLabel(status); }
+  function setDelta(id, status, label) { const node = byId(id); if (!node) return; node.className = `delta ${status || "needs_config"}`; node.textContent = label || statusLabel(status); }
+  function formatDateTime(value) { if (!value) return "Not synced"; const date = new Date(value); return Number.isNaN(date.getTime()) ? "Not synced" : date.toLocaleString([], { month:"short", day:"numeric", hour:"numeric", minute:"2-digit" }); }
+
+  function sourceStatus(channels, key) {
+    return channels[key] || { status: "needs_config", message: "Not connected", metrics: {} };
+  }
+
+  function addAction(tagClass, tag, title, subtitle, button) {
+    const queue = byId("actionQueue");
+    const item = document.createElement("div");
+    item.className = "item";
+    item.innerHTML = `<span class="tag ${tagClass}"></span><div class="body"><div class="ttl"></div><div class="sub"></div></div><button class="go" type="button"></button>`;
+    item.querySelector(".tag").textContent = tag;
+    item.querySelector(".ttl").textContent = title;
+    item.querySelector(".sub").textContent = subtitle;
+    item.querySelector(".go").textContent = button;
+    queue.appendChild(item);
+  }
+
+  function renderActions(data) {
+    const channels = data.channels || {};
+    const queue = byId("actionQueue");
+    queue.innerHTML = "";
+    const shopify = sourceStatus(channels, "shopify");
+    const amazon = sourceStatus(channels, "amazonAds");
+    const google = sourceStatus(channels, "googleAds");
+    const meta = sourceStatus(channels, "meta");
+    const database = data.cache?.database;
+
+    if (!database?.enabled) addAction("t-db", "Cache", "Connect Neon Postgres for saved snapshots", "Dashboard is in direct-read mode until DASHBOARD_DATABASE_DATABASE_URL or DASHBOARD_DATABASE_URL is set.", "Setup");
+    if (shopify.status !== "live") addAction("t-shop", "Shopify", "Connect Shopify Admin for revenue and orders", shopify.message || "Revenue and order metrics are pending credentials.", "Connect");
+    if (amazon.status !== "live") addAction("t-amz", "Amazon", "Connect Amazon Seller inventory", amazon.message || "Seller inventory, SKUs, and marketplace units are pending credentials.", "Connect");
+    if (google.status !== "live") addAction("t-goo", "Google", "Connect Google Ads performance", google.message || "Spend, conversions, CPA, and ROAS are pending credentials.", "Connect");
+    if (meta.status !== "live") addAction("t-meta", "Meta", "Keep Meta ready for a future connector", meta.message || "No Meta connector is active yet.", "Later");
+    if (!queue.children.length) addAction("t-db", "Rules", "No rule alerts in the current snapshot", "All connected sources are healthy for this range.", "Review");
+    text("actionMeta", `${queue.children.length} rules`);
+  }
+
+  function renderActivity(data) {
+    const panel = byId("activityPanel");
+    panel.innerHTML = "";
+    const rows = [
+      { when: "Now", title: `Metrics loaded in ${data.cache?.mode || "direct"} mode`, status: data.cache?.database?.enabled ? "cached" : "direct", cls: data.cache?.database?.enabled ? "st-live" : "st-warn" },
+      { when: "Sync", title: `Last synced ${formatDateTime(data.cache?.capturedAt || data.generatedAt)}`, status: data.cache?.stale ? "stale" : "current", cls: data.cache?.stale ? "st-warn" : "st-live" },
+      { when: "Next", title: `Refresh cadence is every 4 hours`, status: "cron", cls: "st-sync" },
+    ];
+    for (const row of rows) {
+      const el = document.createElement("div");
+      el.className = "arow";
+      el.innerHTML = `<div class="when"></div><div class="body"><div class="ttl"></div></div><div class="st"></div>`;
+      el.querySelector(".when").textContent = row.when;
+      el.querySelector(".ttl").textContent = row.title;
+      const status = el.querySelector(".st");
+      status.className = `st ${row.cls}`;
+      status.textContent = row.status;
+      panel.appendChild(el);
+    }
+  }
+
+  function renderMetrics(data) {
+    const channels = data.channels || {};
+    const generatedAt = new Date(data.generatedAt || Date.now());
+    const liveCount = Object.values(channels).filter((source) => source.status === "live" || source.status === "partial").length;
+    const errorCount = Object.values(channels).filter((source) => source.status === "error").length;
+
+    byId("syncDot").className = `dot ${errorCount ? "error" : liveCount ? "live" : ""}`;
+    text("syncText", `Synced ${generatedAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`);
+    text("sourcePipe", data.message || `${liveCount} live source${liveCount === 1 ? "" : "s"} · cache ${data.cache?.database?.enabled ? "enabled" : "not connected"}`);
+    text("rangeLabel", rangeLabels[state.range] || "last 30 days");
+
+    if (!data.summary?.netRevenue) {
+      renderActions(data);
+      renderActivity(data);
+      return;
+    }
+
+    const shopify = sourceStatus(channels, "shopify");
+
+    text("kpiRevenue", data.summary.netRevenue.display);
+    setDelta("kpiRevenueStatus", data.summary.netRevenue.status, statusLabel(data.summary.netRevenue.status));
+    text("kpiSpend", data.summary.adSpend.display);
+    setDelta("kpiSpendStatus", data.summary.adSpend.status, statusLabel(data.summary.adSpend.status));
+    text("kpiRoas", data.summary.blendedRoas.display);
+    setDelta("kpiRoasStatus", data.summary.blendedRoas.status, statusLabel(data.summary.blendedRoas.status));
+    text("kpiTacos", data.summary.tacos.display);
+    setDelta("kpiTacosStatus", data.summary.tacos.status, statusLabel(data.summary.tacos.status));
+    text("kpiProducts", data.summary.liveProducts?.display);
+    setDelta("kpiProductsStatus", data.summary.liveProducts?.status, shopify.metrics.availableProducts ? `${shopify.metrics.availableProducts} available` : statusLabel(data.summary.liveProducts?.status));
+    text("kpiAvailable", data.summary.availableProducts?.display);
+    setDelta("kpiAvailableStatus", data.summary.availableProducts?.status, statusLabel(data.summary.availableProducts?.status));
+    text("kpiAvgPrice", data.summary.averageShopifyPrice?.display);
+    setDelta("kpiAvgPriceStatus", data.summary.averageShopifyPrice?.status, statusLabel(data.summary.averageShopifyPrice?.status));
+    text("kpiPriceRange", data.summary.shopifyPriceRange?.display);
+    setDelta("kpiPriceRangeStatus", data.summary.shopifyPriceRange?.status, statusLabel(data.summary.shopifyPriceRange?.status));
+
+    setPill("shopifyStatus", shopify.status);
+    text("shopifyRevenue", shopify.metrics.revenue);
+    text("shopifyOrders", shopify.metrics.orders);
+    text("shopifyProducts", shopify.metrics.products);
+    text("shopifyAvailable", shopify.metrics.availableProducts);
+    text("shopifyAvgPrice", shopify.metrics.averagePrice);
+    text("shopifyPriceRange", shopify.metrics.priceRange);
+    text("shopifyMessage", shopify.message);
+
+    const amazon = sourceStatus(channels, "amazonAds");
+    setPill("amazonStatus", amazon.status);
+    text("amazonSpend", amazon.metrics.skus);
+    text("amazonSales", amazon.metrics.inStockSkus);
+    text("amazonRoas", amazon.metrics.units);
+    text("amazonAcos", amazon.metrics.marketplace);
+    text("amazonMessage", amazon.message);
+
+    const google = sourceStatus(channels, "googleAds");
+    setPill("googleStatus", google.status);
+    text("googleSpend", google.metrics.spend);
+    text("googleConversions", google.metrics.conversions);
+    text("googleCpa", google.metrics.cpa);
+    text("googleRoas", google.metrics.roas);
+    text("googleMessage", google.message);
+
+    const search = sourceStatus(channels, "searchConsole");
+    setPill("searchStatus", search.status);
+    text("searchMessage", search.message);
+
+    const meta = sourceStatus(channels, "meta");
+    setPill("metaStatus", meta.status);
+    text("metaMessage", meta.message);
+
+    text("chartMeta", data.cache?.database?.enabled ? "cached history" : "awaiting database");
+    renderActions(data);
+    renderActivity(data);
+  }
+
+  function setView(view) {
+    state.view = view;
+    for (const button of document.querySelectorAll("[data-view]")) button.classList.toggle("on", button.dataset.view === view);
+    const isProducts = view === "products";
+    const isAudit = view === "audit";
+    byId("metricsView").style.display = (isProducts || isAudit) ? "none" : "";
+    byId("productsPanel").classList.toggle("active", isProducts);
+    byId("auditPanel").classList.toggle("active", isAudit);
+    for (const card of document.querySelectorAll(".platform-card")) {
+      const shouldShow = view === "overall" || card.dataset.platform === view || (view === "google" && card.dataset.platform === "search");
+      card.classList.toggle("hidden", !shouldShow);
+    }
+    if (isProducts && !productsLoaded) loadProducts();
+    if (isAudit && !auditLoaded) loadAudit();
+  }
+
+  function renderProducts(data) {
+    const body = byId("productsBody");
+    body.innerHTML = "";
+    const rows = data.rows || [];
+    const shopify = data.platforms?.shopify;
+    const amazon = data.platforms?.amazon;
+    text("productsMeta", `${rows.length} Shopify products`);
+    const amazonCounts = amazon?.metrics?.skuCount
+      ? `${amazon.metrics.skuCount} Amazon SKUs, ${amazon.metrics.totalQuantity || 0} units`
+      : amazon?.message || "Amazon status unavailable";
+    text("productsStatus", `${shopify?.message || "Shopify status unavailable"} · ${amazonCounts}`);
+    if (!rows.length) {
+      body.innerHTML = `<tr><td colspan="7" class="muted">No products found in the latest snapshot.</td></tr>`;
+      return;
+    }
+    for (const row of rows) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td><strong></strong><div class="muted"></div></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+      tr.children[0].querySelector("strong").textContent = row.title || "Untitled product";
+      tr.children[0].querySelector(".muted").textContent = row.vendor || "";
+      tr.children[1].textContent = row.sku || "No SKU";
+      tr.children[2].textContent = row.shopify?.priceDisplay || "No price";
+      tr.children[3].textContent = row.amazon?.priceDisplay || (row.amazon?.asin ? row.amazon.asin : "Not matched");
+      tr.children[4].textContent = row.deltas?.price || "Not connected";
+      tr.children[5].textContent = row.shopify?.sales || "Needs orders";
+      tr.children[6].textContent = row.amazon?.sales || "Not matched";
+      body.appendChild(tr);
+    }
+  }
+
+  async function loadMetrics() {
+    text("syncText", "Loading metrics");
+    try {
+      const response = await fetch(`/api/metrics?range=${encodeURIComponent(state.range)}&t=${Date.now()}`, { headers: { accept: "application/json" } });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      renderMetrics(await response.json());
+    } catch (error) {
+      byId("syncDot").className = "dot error";
+      text("syncText", "Metrics failed");
+      text("sourcePipe", error.message || "Unable to load metrics");
+    }
+  }
+
+  async function loadProducts() {
+    productsLoaded = true;
+    text("productsMeta", "Loading");
+    text("productsStatus", "Loading product comparison snapshot.");
+    try {
+      const response = await fetch(`/api/products?t=${Date.now()}`, { headers: { accept: "application/json" } });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      renderProducts(await response.json());
+    } catch (error) {
+      text("productsMeta", "Failed");
+      text("productsStatus", error.message || "Unable to load products.");
+    }
+  }
+
+  function fmtTypes(types) {
+    return Object.entries(types || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(" · ");
+  }
+
+  function renderAudit(data) {
+    const audit = data && data.audit;
+    if (!audit) {
+      text("auditMeta", "No snapshot");
+      text("auditStatus", (data && data.message) || "No audit snapshot found. Run amazon-ads-audit.py against the Command Center Postgres.");
+      return;
+    }
+    const s = audit.summary;
+    const cap = data.capturedAt ? new Date(data.capturedAt).toLocaleString() : (audit.captured_at || "");
+    text("auditMeta", `${s.campaigns} enabled campaigns · ${s.asins} ASINs · ${s.ad_groups} ad groups · ${s.keywords} keywords`);
+    text("auditStatus", `Captured ${cap} · type mix: ${fmtTypes(s.type_mix)}`);
+
+    const stats = byId("auditStats");
+    stats.innerHTML = "";
+    const tiles = [
+      ["ASINs without Exact", s.gaps.missing_exact, "no graduation target"],
+      ["ASINs without Broad/Phrase", s.gaps.no_broad_phrase, "no discovery"],
+      ["Cannibalized keywords", s.cannibalized_keywords, "same kw in >1 campaign"],
+      ["Campaigns with >1 ad group", s.violations.multi_adgroup, "breaks 1-1-5"],
+      ["Broad/Phrase over 5 keywords", s.violations.broadphrase_over5, "over container cap"],
+      ["Single-campaign ASINs", s.gaps.single_campaign, "under-built"],
+    ];
+    for (const [lab, val, sub] of tiles) {
+      const cell = document.createElement("div");
+      const l = document.createElement("div"); l.className = "lab"; l.textContent = lab;
+      const n = document.createElement("div"); n.className = "num"; n.textContent = val;
+      const r = document.createElement("div"); r.className = "row";
+      const d = document.createElement("span"); d.className = "delta"; d.textContent = sub; r.appendChild(d);
+      cell.appendChild(l); cell.appendChild(n); cell.appendChild(r); stats.appendChild(cell);
+    }
+
+    const cb = byId("auditCannibBody"); cb.innerHTML = "";
+    const cannib = audit.cannibalization || [];
+    text("auditCannibMeta", `${s.cannibalized_keywords} keyword + match combos competing across enabled campaigns (top ${cannib.length} shown)`);
+    if (!cannib.length) {
+      cb.innerHTML = `<tr><td colspan="3" class="muted">No cannibalization detected.</td></tr>`;
+    } else {
+      for (const c of cannib) {
+        const tr = document.createElement("tr");
+        const a = document.createElement("td"); a.textContent = c.keyword;
+        const b = document.createElement("td"); b.textContent = c.match;
+        const d = document.createElement("td"); d.textContent = c.campaigns;
+        tr.appendChild(a); tr.appendChild(b); tr.appendChild(d); cb.appendChild(tr);
+      }
+    }
+
+    const ab = byId("auditAsinBody"); ab.innerHTML = "";
+    const asins = audit.asins || [];
+    text("auditAsinMeta", `${asins.length} advertised ASINs, sorted by campaign count`);
+    if (!asins.length) {
+      ab.innerHTML = `<tr><td colspan="5" class="muted">No ASINs found.</td></tr>`;
+    } else {
+      for (const r of asins) {
+        const tr = document.createElement("tr");
+        const c0 = document.createElement("td"); c0.textContent = r.asin;
+        const c1 = document.createElement("td"); c1.textContent = r.n_campaigns;
+        const c2 = document.createElement("td"); c2.textContent = r.n_product_ads;
+        const c3 = document.createElement("td"); c3.textContent = fmtTypes(r.types);
+        const c4 = document.createElement("td"); c4.textContent = (r.missing && r.missing.length) ? r.missing.join(", ") : "—";
+        tr.appendChild(c0); tr.appendChild(c1); tr.appendChild(c2); tr.appendChild(c3); tr.appendChild(c4); ab.appendChild(tr);
+      }
+    }
+  }
+
+  async function loadAudit() {
+    auditLoaded = true;
+    text("auditMeta", "Loading");
+    text("auditStatus", "Loading audit snapshot.");
+    try {
+      const response = await fetch(`/api/audit?t=${Date.now()}`, { headers: { accept: "application/json" } });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      renderAudit(await response.json());
+    } catch (error) {
+      text("auditMeta", "Failed");
+      text("auditStatus", error.message || "Unable to load audit.");
+    }
+  }
+
+  for (const button of document.querySelectorAll("[data-range]")) {
+    button.addEventListener("click", () => {
+      state.range = button.dataset.range;
+      for (const option of document.querySelectorAll("[data-range]")) option.classList.toggle("on", option === button);
+      loadMetrics();
+    });
+  }
+  for (const button of document.querySelectorAll("[data-view]")) button.addEventListener("click", () => setView(button.dataset.view));
+  byId("refreshButton").addEventListener("click", () => {
+    loadMetrics();
+    if (state.view === "products") { productsLoaded = false; loadProducts(); }
+    if (state.view === "audit") { auditLoaded = false; loadAudit(); }
+  });
+  loadMetrics();
+</script>
+</body>
+</html>

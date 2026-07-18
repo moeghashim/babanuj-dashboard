@@ -1,0 +1,36 @@
+{
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "framework": null,
+  "functions": {
+    "api/metrics.js": {
+      "maxDuration": 15
+    },
+    "api/products.js": {
+      "maxDuration": 15
+    },
+    "api/audit.js": {
+      "maxDuration": 15
+    },
+    "api/cron/sync.js": {
+      "maxDuration": 60
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/sync",
+      "schedule": "0 */4 * * *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
+}
