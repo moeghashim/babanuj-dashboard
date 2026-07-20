@@ -1,9 +1,8 @@
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { makeFunctionReference } from "convex/server";
 
-import { authDb } from "./auth-db";
-import { authUsers } from "./auth-schema";
+import { fetchAuthQuery } from "./auth-server";
 
 export type AuthUserRecord = {
 	email: string;
@@ -11,17 +10,12 @@ export type AuthUserRecord = {
 	name: string;
 };
 
-export async function getAuthUserByEmail(email: string): Promise<AuthUserRecord | null> {
-	const normalizedEmail = email.trim().toLowerCase();
-	const [user] = await authDb
-		.select({
-			email: authUsers.email,
-			id: authUsers.id,
-			name: authUsers.name,
-		})
-		.from(authUsers)
-		.where(eq(authUsers.email, normalizedEmail))
-		.limit(1);
+const getAuthUserByEmailRef = makeFunctionReference<"query", { email: string }, AuthUserRecord | null>(
+	"auth:getAuthUserByEmail",
+);
 
-	return user ?? null;
+export async function getAuthUserByEmail(email: string): Promise<AuthUserRecord | null> {
+	return fetchAuthQuery(getAuthUserByEmailRef, {
+		email: email.trim().toLowerCase(),
+	});
 }

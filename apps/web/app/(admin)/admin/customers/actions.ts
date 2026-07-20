@@ -5,8 +5,9 @@ import { redirect } from "next/navigation";
 
 import { requirePlatformAdmin } from "../../../../lib/auth";
 import { getAuthUserByEmail } from "../../../../lib/auth-users";
-import { createCustomer, updateCustomer, upsertMembership } from "../../../../lib/convex-server";
+import { createCustomer, createCustomerInvite, updateCustomer, upsertMembership } from "../../../../lib/convex-server";
 import { parseChannelValues, slugifyCustomerName, toRequiredString } from "../../../../lib/customers";
+import { parseRequiredDateValue } from "../../../../lib/finance";
 
 export async function createCustomerAction(formData: FormData) {
 	await requirePlatformAdmin();
@@ -66,6 +67,21 @@ export async function upsertMembershipAction(formData: FormData) {
 		role: toRequiredString(formData.get("role"), "Role") as "platform_admin" | "customer_viewer",
 		userEmail: authUser.email,
 		userName: authUser.name,
+	});
+
+	revalidatePath(`/admin/customers/${customerId}`);
+}
+
+export async function createCustomerInviteAction(formData: FormData) {
+	await requirePlatformAdmin();
+
+	const customerId = toRequiredString(formData.get("customerId"), "Customer ID");
+
+	await createCustomerInvite({
+		customerId,
+		email: toRequiredString(formData.get("inviteEmail"), "Invite email"),
+		expiresAt: parseRequiredDateValue(formData.get("expiresOn"), "Invite expiry"),
+		role: toRequiredString(formData.get("role"), "Role") as "platform_admin" | "customer_viewer",
 	});
 
 	revalidatePath(`/admin/customers/${customerId}`);

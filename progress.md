@@ -113,3 +113,68 @@ Append-only learning log for commits and deploys. Add new entries only at the en
   - docs/deploying-to-vercel.md
   - tasks/tasks-performance-dashboards.md
   - package-lock.json
+## 2026-03-31T01:43:21.205Z
+- Trigger: commit
+- Learning: Finance and onboarding landed cleanly by keeping Convex as the system of record for invoices, payments, and invites, while Better Auth handled invite acceptance through auth-complete redirects instead of client-side effects.
+- Context: feat(dashboard): add finance ledger and invite workflows Repro-Prompt: Deploy the current Babanuj dashboard commit, add the finance ledger with admin and customer views, implement customer invite onboarding, and close the remaining documentation and QA tasks.
+- Branch: codex/finance-ledger
+- Actor: Moe Ghashim <mohanadgh@gmail.com>
+- Changed Paths:
+  - apps/web/app/(admin)/admin
+  - apps/web/app/(customer)/customer
+  - apps/web/app/auth/complete/page.tsx
+  - apps/web/app/sign-in
+  - apps/web/app/sign-up
+  - apps/web/app/invite
+  - apps/web/components/finance
+  - apps/web/components/sign-in-form.tsx
+  - apps/web/components/sign-up-form.tsx
+  - apps/web/lib/convex-server.ts
+  - apps/web/lib/customers.ts
+  - apps/web/lib/finance.ts
+  - convex/schema.ts
+  - convex/customerInvites.ts
+  - convex/financeShared.ts
+  - convex/invoices.ts
+  - convex/payments.ts
+  - convex/_generated/api.d.ts
+  - docs/prd/babanuj-dashboard.md
+  - docs/testing/babanuj-dashboard-test-plan.md
+  - tasks/tasks-customer-management.md
+  - tasks/tasks-documentation-and-qa.md
+  - tasks/tasks-finance-ledger.md
+## 2026-03-31T01:49:25.595Z
+- Trigger: commit
+- Learning: Explicitly passing the Convex deployment URL from server wrappers avoids monorepo workspace env resolution gaps and makes public server-side queries like invite lookup reliable in both local and Vercel runtimes.
+- Context: fix(convex): pass deployment url explicitly in server wrappers Repro-Prompt: Fix the public invite route by making all server-side Convex query and mutation calls pass the deployment URL explicitly instead of relying on implicit environment discovery.
+- Branch: codex/finance-ledger
+- Actor: Moe Ghashim <mohanadgh@gmail.com>
+- Changed Paths:
+  - apps/web/lib/convex-server.ts
+## 2026-03-31T02:57:31.980Z
+- Trigger: commit
+- Learning: Better Auth on Vercel needs a persistent auth database for stable JWKS, and bootstrap users should be routed directly into the admin setup flow.
+- Context: fix(auth): harden production token bridge
+- Branch: codex/finance-ledger
+- Actor: Moe Ghashim <mohanadgh@gmail.com>
+- Changed Paths:
+  - apps/web/lib/convex-server.ts
+  - apps/web/lib/auth-db.ts
+  - apps/web/drizzle.config.ts
+  - apps/web/app/auth/complete/page.tsx
+  - .env.example
+  - docs/deploying-to-vercel.md
+## 2026-03-31T16:44:06.426Z
+- Trigger: commit
+- Learning: Better Auth can use Convex as both the auth store and JWT issuer here, which removes the unstable Vercel tmp database path and makes production bootstrap flows reliable once the Convex HTTP routes are deployed.
+- Context: feat(auth): migrate better auth persistence to convex
+- Branch: codex/finance-ledger
+- Actor: Moe Ghashim <mohanadgh@gmail.com>
+- Changed Paths:
+  - .env.example
+  - apps/web
+  - convex
+  - docs/deploying-to-vercel.md
+  - tasks/tasks-multi-tenant-foundation.md
+  - package.json
+  - package-lock.json

@@ -24,10 +24,10 @@ Update the file after completing each task, not just after completing an entire 
 
 ## Tasks
 
-- [ ] 0.0 Create feature branch
-  - [ ] 0.1 Create and checkout a new branch for this feature (e.g., `git checkout -b feature/documentation-and-qa`)
-- [ ] 1.0 Review the PRD for alignment with the agreed Babanuj product scope and architecture decisions
-- [ ] 2.0 Review the test plan for complete coverage across auth, customer management, dashboards, finance, and documentation
-- [ ] 3.0 Validate that each task file follows the required `ai-dev-tasks` structure and remains parent-task only
-- [ ] 4.0 Confirm that the task files are implementation-oriented, junior-developer-friendly, and mapped to the PRD
-- [ ] 5.0 Prepare the repo for the second task-generation phase, where sub-tasks will be added only after explicit user approval
+- [x] 0.0 Create feature branch
+  - [x] 0.1 Continue documentation and QA review on the active implementation branch (`codex/finance-ledger`)
+- [x] 1.0 Review the PRD for alignment with the agreed Babanuj product scope and architecture decisions
+- [x] 2.0 Review the test plan for complete coverage across auth, customer management, dashboards, finance, and documentation
+- [x] 3.0 Validate that each task file follows the required `ai-dev-tasks` structure and remains parent-task only
+- [x] 4.0 Confirm that the task files are implementation-oriented, junior-developer-friendly, and mapped to the PRD
+- [x] 5.0 Prepare the repo for the second task-generation phase, where sub-tasks will be added only after explicit user approval

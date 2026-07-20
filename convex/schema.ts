@@ -13,6 +13,8 @@ const channelValidator = v.union(
 
 const appRoleValidator = v.union(v.literal("platform_admin"), v.literal("customer_viewer"));
 const recordSourceValidator = v.union(v.literal("manual"), v.literal("integration"));
+const invoiceLifecycleValidator = v.union(v.literal("draft"), v.literal("issued"));
+const inviteStatusValidator = v.union(v.literal("pending"), v.literal("accepted"), v.literal("revoked"));
 
 export default defineSchema({
 	channelMetrics: defineTable({
@@ -58,6 +60,41 @@ export default defineSchema({
 	})
 		.index("by_slug", ["slug"]),
 
+	customerInvites: defineTable({
+		acceptedAt: v.optional(v.number()),
+		acceptedBy: v.optional(v.string()),
+		createdAt: v.number(),
+		createdBy: v.string(),
+		customerId: v.id("customers"),
+		email: v.string(),
+		expiresAt: v.number(),
+		role: appRoleValidator,
+		status: inviteStatusValidator,
+		token: v.string(),
+		updatedAt: v.number(),
+		updatedBy: v.string(),
+	})
+		.index("by_customer_id", ["customerId"])
+		.index("by_email", ["email"])
+		.index("by_token", ["token"]),
+
+	invoices: defineTable({
+		amount: v.number(),
+		createdAt: v.number(),
+		createdBy: v.string(),
+		currencyCode: v.string(),
+		customerId: v.id("customers"),
+		dueDate: v.number(),
+		invoiceNumber: v.string(),
+		issuedDate: v.number(),
+		lifecycleStatus: invoiceLifecycleValidator,
+		note: v.optional(v.string()),
+		updatedAt: v.number(),
+		updatedBy: v.string(),
+	})
+		.index("by_customer_id", ["customerId"])
+		.index("by_customer_invoice_number", ["customerId", "invoiceNumber"]),
+
 	reportingPeriods: defineTable({
 		createdAt: v.number(),
 		label: v.string(),
@@ -66,4 +103,20 @@ export default defineSchema({
 		year: v.number(),
 	})
 		.index("by_period_key", ["periodKey"]),
+
+	payments: defineTable({
+		amount: v.number(),
+		createdAt: v.number(),
+		createdBy: v.string(),
+		currencyCode: v.string(),
+		customerId: v.id("customers"),
+		invoiceId: v.id("invoices"),
+		note: v.optional(v.string()),
+		paymentDate: v.number(),
+		reference: v.optional(v.string()),
+		updatedAt: v.number(),
+		updatedBy: v.string(),
+	})
+		.index("by_customer_id", ["customerId"])
+		.index("by_invoice_id", ["invoiceId"]),
 });

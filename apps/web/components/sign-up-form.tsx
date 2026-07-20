@@ -7,10 +7,16 @@ import { useState, useTransition } from "react";
 
 import { authClient } from "../lib/auth-client";
 
-export function SignUpForm() {
+type SignUpFormProps = {
+	defaultEmail?: string;
+	inviteToken?: string;
+};
+
+export function SignUpForm({ defaultEmail, inviteToken }: SignUpFormProps) {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const callbackURL = inviteToken ? `/auth/complete?invite=${inviteToken}` : "/auth/complete";
 
 	return (
 		<form
@@ -31,7 +37,7 @@ export function SignUpForm() {
 					setErrorMessage(null);
 
 					const result = await authClient.signUp.email({
-						callbackURL: "/auth/complete",
+						callbackURL,
 						email,
 						name,
 						password,
@@ -42,7 +48,7 @@ export function SignUpForm() {
 						return;
 					}
 
-					router.push("/auth/complete");
+					router.push(callbackURL);
 					router.refresh();
 				});
 			}}
@@ -53,7 +59,14 @@ export function SignUpForm() {
 			</label>
 			<label className="field">
 				<span className="field-label">Email</span>
-				<input autoComplete="email" className="shell-input" name="email" required type="email" />
+				<input
+					autoComplete="email"
+					className="shell-input"
+					defaultValue={defaultEmail}
+					name="email"
+					required
+					type="email"
+				/>
 			</label>
 			<label className="field">
 				<span className="field-label">Password</span>
@@ -71,7 +84,14 @@ export function SignUpForm() {
 				<Button isDisabled={isPending} type="submit" variant="primary">
 					{isPending ? "Creating account..." : "Create account"}
 				</Button>
-				<Link className="shell-nav-link" href="/sign-in">
+				<Link
+					className="shell-nav-link"
+					href={
+						inviteToken
+							? `/sign-in?invite=${inviteToken}&email=${encodeURIComponent(defaultEmail ?? "")}`
+							: "/sign-in"
+					}
+				>
 					Already have access?
 				</Link>
 			</div>

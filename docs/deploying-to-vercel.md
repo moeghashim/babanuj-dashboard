@@ -18,7 +18,18 @@ Use Vercel Git integration as the default deployment path for this starter.
 
 ## Environment Variables
 
-Start with no extra environment variables unless your app adds them. Configure app-specific secrets in the Vercel project, scoped to `apps/web`.
+Configure app-specific secrets in the Vercel project, scoped to `apps/web`.
+
+- `NEXT_PUBLIC_CONVEX_URL`
+- `CONVEX_SITE_URL`
+- `CONVEX_DEPLOYMENT`
+
+Better Auth persistence now lives in Convex through the `@convex-dev/better-auth` component, so the app no longer needs a separate production auth database on Vercel.
+
+Configure the matching auth settings on the Convex deployment as well:
+
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL=https://babanuj-dashboard.vercel.app`
 
 ## Solo Shipping Flow
 

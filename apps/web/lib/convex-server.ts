@@ -1,9 +1,14 @@
-import { fetchMutation, fetchQuery } from "convex/nextjs";
+import { fetchQuery } from "convex/nextjs";
 import { makeFunctionReference } from "convex/server";
-import { headers } from "next/headers";
 
-import { auth } from "./auth-config";
-import type { CustomerMembershipRecord, CustomerRecord } from "./customers";
+import { fetchAuthMutation, fetchAuthQuery } from "./auth-server";
+import type {
+	CustomerInviteDetailRecord,
+	CustomerInviteRecord,
+	CustomerMembershipRecord,
+	CustomerRecord,
+} from "./customers";
+import type { AdminFinanceOverview, CustomerFinanceOverview, InvoiceRecord } from "./finance";
 import type {
 	AdminMetricRecord,
 	AdminPerformanceOverview,
@@ -35,6 +40,12 @@ const listMembershipsForCustomerRef = makeFunctionReference<
 	{ customerId: string },
 	CustomerMembershipRecord[]
 >("memberships:listMembershipsForCustomer");
+const listInvitesForCustomerRef = makeFunctionReference<"query", { customerId: string }, CustomerInviteRecord[]>(
+	"customerInvites:listInvitesForCustomer",
+);
+const getInviteByTokenRef = makeFunctionReference<"query", { token: string }, CustomerInviteDetailRecord | null>(
+	"customerInvites:getInviteByToken",
+);
 const createCustomerRef = makeFunctionReference<
 	"mutation",
 	{
@@ -68,6 +79,19 @@ const upsertMembershipRef = makeFunctionReference<
 	},
 	string
 >("memberships:upsertMembership");
+const createCustomerInviteRef = makeFunctionReference<
+	"mutation",
+	{
+		customerId: string;
+		email: string;
+		expiresAt: number;
+		role: CustomerMembershipRecord["role"];
+	},
+	string
+>("customerInvites:createCustomerInvite");
+const acceptCustomerInviteRef = makeFunctionReference<"mutation", { token: string }, string>(
+	"customerInvites:acceptCustomerInvite",
+);
 const listReportingPeriodsRef = makeFunctionReference<"query", { customerId?: string }, ReportingPeriodRecord[]>(
 	"reportingPeriods:listReportingPeriods",
 );
@@ -101,57 +125,69 @@ const getCustomerPerformanceOverviewRef = makeFunctionReference<
 	{ customerId: string; periodKey?: string },
 	CustomerPerformanceOverview
 >("channelMetrics:getCustomerPerformanceOverview");
+const createInvoiceRef = makeFunctionReference<
+	"mutation",
+	{
+		amount: number;
+		customerId: string;
+		dueDate: number;
+		invoiceNumber: string;
+		issuedDate: number;
+		lifecycleStatus: InvoiceRecord["lifecycleStatus"];
+		note?: string;
+	},
+	string
+>("invoices:createInvoice");
+const getAdminFinanceOverviewRef = makeFunctionReference<"query", { customerId?: string }, AdminFinanceOverview>(
+	"invoices:getAdminFinanceOverview",
+);
+const getCustomerFinanceOverviewRef = makeFunctionReference<"query", { customerId: string }, CustomerFinanceOverview>(
+	"invoices:getCustomerFinanceOverview",
+);
+const createPaymentRef = makeFunctionReference<
+	"mutation",
+	{
+		amount: number;
+		invoiceId: string;
+		note?: string;
+		paymentDate: number;
+		reference?: string;
+	},
+	string
+>("payments:createPayment");
 
-export async function getConvexToken() {
-	try {
-		const tokenResponse = await auth.api.getToken({
-			headers: await headers(),
-		});
+function getConvexDeploymentUrl() {
+	const deploymentUrl = process.env.NEXT_PUBLIC_CONVEX_URL ?? process.env.CONVEX_URL;
 
-		return tokenResponse.token;
-	} catch {
-		return null;
+	if (!deploymentUrl) {
+		throw new Error("Convex deployment URL is not configured.");
 	}
+
+	return deploymentUrl;
 }
 
 export async function getViewerContext() {
-	const token = await getConvexToken();
-
-	if (!token) {
-		return null;
-	}
-
-	return fetchQuery(viewerContextRef, {}, { token });
+	return fetchAuthQuery(viewerContextRef, {});
 }
 
 export async function listAccessibleCustomers() {
-	const token = await getConvexToken();
-
-	if (!token) {
-		return [];
-	}
-
-	return fetchQuery(listAccessibleCustomersRef, {}, { token });
+	return fetchAuthQuery(listAccessibleCustomersRef, {});
 }
 
 export async function getCustomerById(customerId: string) {
-	const token = await getConvexToken();
-
-	if (!token) {
-		return null;
-	}
-
-	return fetchQuery(getCustomerByIdRef, { customerId }, { token });
+	return fetchAuthQuery(getCustomerByIdRef, { customerId });
 }
 
 export async function listMembershipsForCustomer(customerId: string) {
-	const token = await getConvexToken();
+	return fetchAuthQuery(listMembershipsForCustomerRef, { customerId });
+}
 
-	if (!token) {
-		return [];
-	}
+export async function listInvitesForCustomer(customerId: string) {
+	return fetchAuthQuery(listInvitesForCustomerRef, { customerId });
+}
 
-	return fetchQuery(listMembershipsForCustomerRef, { customerId }, { token });
+export async function getInviteByToken(token: string) {
+	return fetchQuery(getInviteByTokenRef, { token }, { url: getConvexDeploymentUrl() });
 }
 
 export async function createCustomer(payload: {
@@ -160,22 +196,11 @@ export async function createCustomer(payload: {
 	name: string;
 	slug: string;
 }) {
-	const token = await getConvexToken();
-	if (!token) {
-		throw new Error("Missing Better Auth JWT token. Sign in again and retry the customer update.");
-	}
-
-	return fetchMutation(createCustomerRef, payload, { token });
+	return fetchAuthMutation(createCustomerRef, payload);
 }
 
 export async function listReportingPeriods(customerId?: string) {
-	const token = await getConvexToken();
-
-	if (!token) {
-		return [];
-	}
-
-	return fetchQuery(listReportingPeriodsRef, customerId ? { customerId } : {}, { token });
+	return fetchAuthQuery(listReportingPeriodsRef, customerId ? { customerId } : {});
 }
 
 export async function updateCustomer(payload: {
@@ -186,12 +211,7 @@ export async function updateCustomer(payload: {
 	slug: string;
 	status: CustomerRecord["status"];
 }) {
-	const token = await getConvexToken();
-	if (!token) {
-		throw new Error("Missing Better Auth JWT token. Sign in again and retry the customer update.");
-	}
-
-	return fetchMutation(updateCustomerRef, payload, { token });
+	return fetchAuthMutation(updateCustomerRef, payload);
 }
 
 export async function upsertMembership(payload: {
@@ -201,12 +221,20 @@ export async function upsertMembership(payload: {
 	userEmail: string;
 	userName?: string;
 }) {
-	const token = await getConvexToken();
-	if (!token) {
-		throw new Error("Missing Better Auth JWT token. Sign in again and retry the membership update.");
-	}
+	return fetchAuthMutation(upsertMembershipRef, payload);
+}
 
-	return fetchMutation(upsertMembershipRef, payload, { token });
+export async function createCustomerInvite(payload: {
+	customerId: string;
+	email: string;
+	expiresAt: number;
+	role: CustomerMembershipRecord["role"];
+}) {
+	return fetchAuthMutation(createCustomerInviteRef, payload);
+}
+
+export async function acceptCustomerInvite(tokenValue: string) {
+	return fetchAuthMutation(acceptCustomerInviteRef, { token: tokenValue });
 }
 
 export async function upsertChannelMetric(payload: {
@@ -218,43 +246,47 @@ export async function upsertChannelMetric(payload: {
 	source: "manual" | "integration";
 	sourceReference?: string;
 }) {
-	const token = await getConvexToken();
-
-	if (!token) {
-		throw new Error("Missing Better Auth JWT token. Sign in again and retry the performance update.");
-	}
-
-	return fetchMutation(upsertChannelMetricRef, payload, { token });
+	return fetchAuthMutation(upsertChannelMetricRef, payload);
 }
 
 export async function getAdminPerformanceOverview(periodKey?: string) {
-	const token = await getConvexToken();
-
-	if (!token) {
-		throw new Error("Missing Better Auth JWT token. Sign in again and retry the dashboard request.");
-	}
-
-	return fetchQuery(getAdminPerformanceOverviewRef, periodKey ? { periodKey } : {}, { token });
+	return fetchAuthQuery(getAdminPerformanceOverviewRef, periodKey ? { periodKey } : {});
 }
 
 export async function listAdminMetricsForPeriod(periodKey?: string) {
-	const token = await getConvexToken();
-
-	if (!token) {
-		throw new Error("Missing Better Auth JWT token. Sign in again and retry the dashboard request.");
-	}
-
-	return fetchQuery(listAdminMetricsForPeriodRef, periodKey ? { periodKey } : {}, { token });
+	return fetchAuthQuery(listAdminMetricsForPeriodRef, periodKey ? { periodKey } : {});
 }
 
 export async function getCustomerPerformanceOverview(customerId: string, periodKey?: string) {
-	const token = await getConvexToken();
+	return fetchAuthQuery(getCustomerPerformanceOverviewRef, periodKey ? { customerId, periodKey } : { customerId });
+}
 
-	if (!token) {
-		throw new Error("Missing Better Auth JWT token. Sign in again and retry the dashboard request.");
-	}
+export async function createInvoice(payload: {
+	amount: number;
+	customerId: string;
+	dueDate: number;
+	invoiceNumber: string;
+	issuedDate: number;
+	lifecycleStatus: InvoiceRecord["lifecycleStatus"];
+	note?: string;
+}) {
+	return fetchAuthMutation(createInvoiceRef, payload);
+}
 
-	return fetchQuery(getCustomerPerformanceOverviewRef, periodKey ? { customerId, periodKey } : { customerId }, {
-		token,
-	});
+export async function getAdminFinanceOverview(customerId?: string) {
+	return fetchAuthQuery(getAdminFinanceOverviewRef, customerId ? { customerId } : {});
+}
+
+export async function getCustomerFinanceOverview(customerId: string) {
+	return fetchAuthQuery(getCustomerFinanceOverviewRef, { customerId });
+}
+
+export async function createPayment(payload: {
+	amount: number;
+	invoiceId: string;
+	note?: string;
+	paymentDate: number;
+	reference?: string;
+}) {
+	return fetchAuthMutation(createPaymentRef, payload);
 }
